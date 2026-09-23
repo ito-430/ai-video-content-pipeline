@@ -70,7 +70,7 @@ ARENA_CX = ARENA_W / 2
 ARENA_CY = ARENA_H / 2
 RENDER_SCALE = OUTPUT_WIDTH / ARENA_W  # 最終書き出し時の拡大率
 
-# 2026-09-09、ユーザー要望: 枠(壁)はキャンバスいっぱいに引き伸ばした楕円/矩形である必要はなく、
+# 枠(壁)はキャンバスいっぱいに引き伸ばした楕円/矩形である必要はなく、
 # 真円/正方形でよい(そのほうが回転にも対応しやすい)。半径/半辺長を両形状で共有し、
 # 正方形の対角線がちょうどARENA_Wに収まるサイズにすることで、どちらの形状も全方向の回転で
 # キャンバス外にはみ出さない(円は回転しても輪郭が変わらないため無条件に安全)。
@@ -83,7 +83,7 @@ ARENA_RIGHT = ARENA_CX + ARENA_HALF_EXTENT
 # 旧枠(ARENA_CX=400を基準に調整されていた各種サイズ)を新しい半径に合わせて比例縮小するための係数
 _ARENA_SCALE = ARENA_HALF_EXTENT / ARENA_CX  # = 1/sqrt(2) ≈ 0.707
 
-# 2026-09-08、ユーザー要望「ステージのバリエーションを増やしてほしい、広いステージも歓迎」
+# 「ステージのバリエーションを増やしてほしい、広いステージも歓迎」
 # 「画面をもっと使いたい、脱落したら画面外に出るイメージ」への対応。
 # 縦横で別の半径/半辺長(half_x, half_y)を持てるようにし、「compact/spacious」(縦横比は
 # 正方形/真円のまま一律スケール)に加えて「tall」(縦に伸ばして画面の縦方向をより使う)を追加した。
@@ -137,7 +137,7 @@ WALL_THICKNESS = 10  # 物理演算上の壁の厚み(当たり判定)。既存�
 # 太くしてもシミュレーションのチューニング(反発・衝突タイミング等)には一切影響しない
 WALL_VISUAL_THICKNESS = 20
 
-# 2026-09-09、ユーザー指摘: 枠(壁)が描画キャンバスの端ギリギリに全面表示されるため、
+# 枠(壁)が描画キャンバスの端ギリギリに全面表示されるため、
 # YouTube Shortsの下部UI(再生バー・キャプション欄)や右側の操作ボタン列と重なって見えにくい。
 # 対策として、最終書き出し時に映像全体をわずかに縮小し、アリーナと同じ背景色の余白で
 # 画面全体を囲む(黒帯ではなく背景色の余白なので、フルブリードの見た目はほぼ損なわれない)。
@@ -155,7 +155,7 @@ ESCAPE_MARGIN = 40.0 * _ARENA_SCALE
 # 変わっても自動的にスケールする。
 INITIAL_IMPULSE_TARGET_SECONDS = 0.6
 
-# 2026-09-16、冒頭フック強化(ユーザー指示): 「開始0.1秒で必ず最初の衝突を起こす」ため、
+# 2026-09-16、冒頭フック強化: 「開始0.1秒で必ず最初の衝突を起こす」ため、
 # 中心方向インパルスに加えて各プレイヤーへ最も近い他プレイヤー方向への追加インパルスを
 # 与える。値は「無風状態ならこの秒数で最近接プレイヤーに到達する」速度になるよう距離から
 # 逆算するが、双方が同時に相手へ向かうため実際の衝突はこの値よりかなり早く起こる。
@@ -164,7 +164,7 @@ INITIAL_IMPULSE_TARGET_SECONDS = 0.6
 # 2026-09-16追記: 導入直後の値(0.3)はFIRST_IMPACT_MAX_SECONDS(1.5秒)の条件は満たすものの、
 # 序盤の衝突が強すぎて全体の決着ペースまで早め、本番の尺フィルター(15〜25秒、
 # geometry_battle_scoring.PRODUCTION_DECISION_SECONDS_RANGE)を通過する候補が短尺側に
-# 偏る副作用が実測で確認された(ユーザー指摘: 「動画の尺自体が短い」)。daily_pipelineの
+# 偏る副作用が実測で確認された(「動画の尺自体が短い」)。daily_pipelineの
 # 候補生成ロジックで0.3/0.5/0.6/0.8/1.0/1.2/1.5/2.0を比較したところ、0.8が最も尺フィルター
 # 合格率が高く中央値も改善する一方、最初の衝突が1.5秒を超えるケースは0.3〜2.0のどの値でも
 # 発生しなかった(中心方向インパルスと合わせて元々十分早いため)ことから0.8を採用する。
@@ -179,13 +179,13 @@ DEFAULT_ELASTICITY = 0.992
 DEFAULT_DAMPING = 0.9998  # 空気抵抗相当。1.0だと理論上減衰せず終わらないため微量だけ減衰させる
 DEFAULT_HOLE_WIDTH = round(130 * _ARENA_SCALE)
 # 摩擦係数。低いほど床/壁との接触で水平方向の運動量を失いにくく、跳ね回り続けて
-# 「停滞」しにくくなる(2026-09-07、ユーザー指摘によりデフォルトを大幅に下げた)
+# 「停滞」しにくくなる(デフォルトを大幅に下げた)
 DEFAULT_FRICTION = 0.05
 DEFAULT_ROTATION_SPEED = 0.0
 DEFAULT_SHAPE = "square"
 DEFAULT_RULE = "hole_fall"
 # プレイヤー本体の形状(枠の形状=DEFAULT_SHAPEとは別軸)。"circle"|"square"|"triangle"
-# 2026-09-08、ユーザー方針: triangleは通常の物理演算(円と同じ重力・初期スピンのみ)のまま、
+# triangleは通常の物理演算(円と同じ重力・初期スピンのみ)のまま、
 # 独自の挙動を提案するまでは実装しない(circleは通常物理、squareのみ「重力なし・常に直進・
 # 衝突等の外力では回転しうる」専用挙動を実装済み)。
 DEFAULT_PLAYER_SHAPE = "circle"
@@ -224,7 +224,7 @@ ZONE_END_RADIUS = 60.0
 # (実際にシミュレーションを回して確認: 40シード中40件が15〜25秒に収まることを確認済み)。
 ZONE_SHRINK_SECONDS = 30.0
 
-# 新ステージ内部構造(Terrain、2026-09-09、ユーザー要望)。外枠の形状(真円/正方形)や
+# 新ステージ内部構造(Terrain、2026-09-09)。外枠の形状(真円/正方形)や
 # _arena_layoutの基礎ロジックは変更せず、既存の枠の内部にpymunk.Segment/pymunk.Circleによる
 # 障害物を追加配置する形で実装する。全て中心座標からの相対位置(ローカル座標)で定義し、
 # 壁と同じarena_body(回転するkinematic body)に追加することで、全方向回転のギミックが
@@ -236,7 +236,7 @@ TERRAIN_TYPES = ["hourglass", "donut", "cross", "pegboard", "pinball", "two_tier
 # 発生率を大幅に低減(実測でほぼ解消、残りはdaily_pipeline.py側でhourglassのn_circlesを
 # 6以下に制限することで完全に解消したことを確認済み)。
 CHOKE_WIDTH_RATIO = 3.2  # hourglass: 中央通路の幅(プレイヤー半径の倍数)
-# 2026-09-09(ユーザー要望で再設計、2回目): 「内部障害物+四角い外枠」ではなく、砂時計の
+# 2026-09-09(再設計、2回目): 「内部障害物+四角い外枠」ではなく、砂時計の
 # シルエットそのものが外枠になる仕様に変更(通常の四角/円の壁を廃止)。それに伴いサイズも
 # half_x一杯まで拡大した(以前は外枠と別形状に見せるためHOURGLASS_WIDTH_RATIO=0.5に
 # 絞っていたが、外枠自体を廃止したので絞る理由がなくなった。1.0にすると正方形の角と
@@ -245,7 +245,7 @@ CHOKE_WIDTH_RATIO = 3.2  # hourglass: 中央通路の幅(プレイヤー半径�
 # 専用の_hourglass_boundary_chain/_point_in_hourglassで別管理する
 # (build_space/spawn_circles/_iter_rendered_framesそれぞれで分岐)。
 HOURGLASS_WIDTH_RATIO = 1.0  # half_xに対する、砂時計の最も幅広い部分(上端・下端)の比率
-# 2026-09-09、ユーザー要望「縦方向にもっと大きくしていい」への対応。hourglass専用の実効half_y
+# 「縦方向にもっと大きくしていい」への対応。hourglass専用の実効half_y
 # (_hourglass_boundary_chain/_point_in_hourglass/脱落判定のescape_half_yすべてで共通して使う)。
 # 1.8倍まで試したが、area_controlの安全地帯(ZONE_SHRINK_SECONDS=30、hourglass以外の全terrainと
 # 共有するグローバル定数で地形別の調整はしていない)が広がった分の移動距離に追いつけず、
@@ -257,7 +257,7 @@ CROSS_OPENING_RATIO = 2.8  # cross: 中央開口部の半径(プレイヤー半�
 
 # two_tier: 上段に浮かせる3つの足場(左/中央/右)の配置パラメータ。
 TWO_TIER_PLATFORM_Y_FRAC = -0.45  # half_yに対する比率(負=上寄り)。山型の「低い端」の高さ
-# 2026-09-20、ユーザー指示: 「上部の足場は三つの長方形でなく、間に滑らせる前提で三角形に」。
+# 「上部の足場は三つの長方形でなく、間に滑らせる前提で三角形に」。
 # 平らな板(2点の水平線分)から山型(への字、3点の折れ線)へ変更。頂点でスポーンし、
 # 重力で左右どちらかの斜面を滑り落ちて低い端(枝分かれの先、武器の位置)へ到達する
 # 動線を作る狙い。頂点の高さは低い端よりhalf_len*係数だけ高くする(緩すぎず滑り落ちる
@@ -297,7 +297,7 @@ def _two_tier_platforms(half_x: float, half_y: float) -> list[tuple[float, float
 
 # split_horizontal: 上下の陣地を隔てる仕切りの位置(half_yに対する比率、中心からの距離)。
 SPLIT_HORIZONTAL_DIVIDER_FRAC = 0.30
-SPLIT_HORIZONTAL_GUN_RESPAWN_DELAY_SECONDS = 0.2  # 通常(0.5秒)より頻度を上げる(ユーザー指示)
+SPLIT_HORIZONTAL_GUN_RESPAWN_DELAY_SECONDS = 0.2  # 通常(0.5秒)より頻度を上げる
 PEG_RADIUS = 14.0 * _ARENA_SCALE
 # 2026-09-09、実測により再調整: 当初spacing=95だとプレイヤー直径(≈50)とほぼ同じ隙間しか空かず、
 # hole_fallで20シード中18〜20件が90秒経っても決着しない(ピンの上で詰まり続ける)不具合が
@@ -308,29 +308,29 @@ PEG_SPACING_Y = 160.0 * _ARENA_SCALE
 # pegboardは下部(hole_fallの出口付近)を空けておく(完全に塞ぐと出口に到達できなくなるため)
 PEG_BOTTOM_MARGIN_RATIO = 0.6
 
-# 2026-09-13、新terrain: pinball。「本格ピンボール型ステージ」指示書に基づき全面改修
+# 2026-09-13、新terrain: pinball。「本格ピンボール型ステージ」設計仕様書に基づき全面改修
 # (当初の3連バンパーのみの試作から、バンパー+スリングショット+誘導スロープの構成へ拡張)。
 # tallステージ(縦長)をベースに、上部の3連ポップバンパー(逆三角形配置)・下部左右の
 # スリングショット(斜面で中央上方へ弾く)・最下部の誘導スロープ(穴へ滑り込ませる)を
 # 組み合わせ、「真下に落ちるだけの単調な決着」を防ぐ。
 #
-# ポップバンパー(逆三角形: 上に2つ・下に1つ)。指示書「Y座標60〜75%付近」は、下から数えた
-# 高さの割合と解釈(=上端からは25〜40%の位置)。指示書の「プレイヤー半径の0.8〜1.2倍」に
+# ポップバンパー(逆三角形: 上に2つ・下に1つ)。設計仕様書「Y座標60〜75%付近」は、下から数えた
+# 高さの割合と解釈(=上端からは25〜40%の位置)。設計仕様書の「プレイヤー半径の0.8〜1.2倍」に
 # 合わせて半径を設定。
 PINBALL_BUMPER_RADIUS = CIRCLE_RADIUS * 1.15
 PINBALL_BUMPER_TOP_Y_RATIO = -0.5  # 上2つ(逆三角形の上辺)
 PINBALL_BUMPER_BOTTOM_Y_RATIO = -0.28  # 下1つ(逆三角形の頂点)
 PINBALL_BUMPER_X_RATIO = 0.32
-# 指示書指定の反発係数1.3〜1.5の下寄り。2026-09-09に判明した「反発係数>1.0だと衝突の
+# 設計仕様書指定の反発係数1.3〜1.5の下寄り。2026-09-09に判明した「反発係数>1.0だと衝突の
 # 度に運動エネルギーが増え続け壁をすり抜ける」不具合(776行目付近参照)と同じ罠を避けるため、
 # pin_wallと同様に毎フレームの速度クランプ(PINBALL_MAX_SPEED)を安全弁として併用する。
 PINBALL_BUMPER_RESTITUTION = 1.35
 PINBALL_MAX_SPEED = 950.0 * _ARENA_SCALE
 PINBALL_COLOR = (255, 210, 60)  # アーケードのバンパーらしい暖色(他terrainの円形障害物と区別)
-PINBALL_FLASH_SCALE = 1.2  # ヒット時の一瞬の拡縮倍率(指示書指定)
+PINBALL_FLASH_SCALE = 1.2  # ヒット時の一瞬の拡縮倍率(設計仕様書指定)
 PINBALL_FLASH_FRAMES = 8  # 拡縮が持続するフレーム数
 
-# 2026-09-13、ユーザー指摘対応「上の領域を活かす工夫」: スポーン帯(最上段)とメインの
+# 「上の領域を活かす工夫」: スポーン帯(最上段)とメインの
 # 3連バンパーの間が、ただ落下するだけの空白区間になっていた。同じ仕組み(circles、
 # collision_type=8)を使い回せる小型バンパー2個を間に追加し、メインクラスターへ到達する前に
 # 一度弾かれる「2段カスケード」にすることで、tallステージの縦方向をより使い切る。
@@ -339,7 +339,7 @@ PINBALL_UPPER_BUMPER_Y_RATIO = -0.72  # メインクラスター(-0.5)よりさ�
 PINBALL_UPPER_BUMPER_X_RATIO = 0.16  # メインクラスターより中央寄り(左右で挟むだけの軽い誘導)
 # スポーン安全マージンは実際に最も上にあるバンパー(この上段バンパー)基準で計算する。
 
-# 2026-09-13、ユーザー指摘対応「バンパーヒットが前半(=上部)にしか起こらず、勝負のほとんどが
+# 「バンパーヒットが前半(=上部)にしか起こらず、勝負のほとんどが
 # 画面下部で行われている」: 上2段のバンパー群(-0.72〜-0.28)より下、スリングショット
 # (+0.62)より上の範囲がまるごと空白(ただ自由落下するだけ)になっていたのが原因。
 # 中段にもう1組バンパーを追加し、落下の全行程でバンパーとの接触が起こるようにする
@@ -348,8 +348,8 @@ PINBALL_MID_BUMPER_RADIUS = PINBALL_BUMPER_RADIUS * 0.85
 PINBALL_MID_BUMPER_Y_RATIO = 0.1  # 中央よりやや下、スリングショット(+0.62)よりはっきり上
 PINBALL_MID_BUMPER_X_RATIO = 0.4  # メインクラスター(0.32)より外側にずらす
 
-# 2026-09-13、ユーザー再指摘: 「バンパーの数を上げるのではなく、上部領域での接触期間を
-# 意識する方法で」対応してほしいとのこと。フリッパーで押し戻す方向の低段バンパー(前回追加分)
+# 「バンパーの数を上げるのではなく、上部領域での接触期間を意識する方法で」改善する方針とし、
+# フリッパーで押し戻す方向の低段バンパー(前回追加分)
 # は削除し(下記参照)、代わりに上部バンパー帯(上段〜メインクラスター)の中では重力を
 # 部分的に打ち消し、自然落下より滞空時間を延ばすことでバンパーとの接触機会を増やす
 # アプローチに切り替える。space.gravityはspace全体に一様にかかるため、このゾーン内にいる
@@ -359,9 +359,9 @@ PINBALL_FLOAT_ZONE_TOP_Y_RATIO = PINBALL_UPPER_BUMPER_Y_RATIO - 0.08  # 上段�
 PINBALL_FLOAT_ZONE_BOTTOM_Y_RATIO = PINBALL_MID_BUMPER_Y_RATIO - 0.05  # 中段バンパーの少し上まで
 PINBALL_FLOAT_GRAVITY_SCALE = 0.4  # このゾーン内では通常重力の40%分だけ効かせる
 
-# スリングショット(下部左右、斜面で中央上方へ弾く)。指示書のSLINGSHOT_ANGLE(35〜45度)は
+# スリングショット(下部左右、斜面で中央上方へ弾く)。設計仕様書のSLINGSHOT_ANGLE(35〜45度)は
 # 中央寄りの値を採用。反発係数もバンパーと同じ理由でPINBALL_MAX_SPEEDの安全弁下で運用する。
-# 2026-09-13、ユーザー指摘によりさらに大きく(90→170、約1.9倍)。半径282.8のアリーナで
+# さらに大きく(90→170、約1.9倍)。半径282.8のアリーナで
 # tip_xが中心線を越えない(左右が交差しない)ことを確認済み。
 SLINGSHOT_ANGLE_DEG = 40.0
 SLINGSHOT_LENGTH = 170.0 * _ARENA_SCALE
@@ -377,8 +377,8 @@ DRAIN_LENGTH = 140.0 * _ARENA_SCALE
 DRAIN_TARGET_HALF_WIDTH = 50.0 * _ARENA_SCALE
 DRAIN_WALL_MARGIN = 10.0 * _ARENA_SCALE
 
-# 2026-09-13、指示書④「自動パルスフリッパー」対応。実際のフリッパー形状(回転する2本のバー)は
-# 実装せず、指示書が挙げた代替案「周期的なキック力を持たせる」の方を採用する(プレイヤー入力の
+# 2026-09-13、設計仕様書④「自動パルスフリッパー」対応。実際のフリッパー形状(回転する2本のバー)は
+# 実装せず、設計仕様書が挙げた代替案「周期的なキック力を持たせる」の方を採用する(プレイヤー入力の
 # ない自動対戦という前提と相性がよく、当たり判定・描画とも既存terrainの円/セグメントの枠組みを
 # 増やさずに済む)。穴の手前に薄い帯状のゾーンを置き、一定間隔でゾーン内の全プレイヤーへ
 # まとめて上向きのキックを与えることで、「即落ちを救済して乱戦を長引かせる」狙いを実現する。
@@ -387,7 +387,7 @@ FLIPPER_ZONE_HEIGHT = 70.0 * _ARENA_SCALE  # 穴のすぐ手前の帯の高さ
 FLIPPER_PULSE_INTERVAL_SECONDS = 0.5  # このリズムでフリッパー群が自動的に跳ね上げる
 # バンパー/スリングショットと違い反発係数ではなく直接の速度上書きにしている(こちらは
 # PINBALL_MAX_SPEEDの範囲内の値を最初から使うため、安全弁を別途二重に掛ける必要がない)。
-# 2026-09-13、ユーザー指摘で低段バンパー(フリッパーで押し戻す方式)を撤回したため、
+# 低段バンパー(フリッパーで押し戻す方式)を撤回したため、
 # フリッパーの狙いも「即落ちの救済」という元の役割に戻し、キック速度も元の値に戻した。
 FLIPPER_KICK_SPEED = 700.0 * _ARENA_SCALE
 FLIPPER_COLOR = (120, 220, 255)  # バンパー(暖色)と区別する寒色
@@ -433,22 +433,22 @@ def _pinball_drain_chains(half_x: float, half_y: float) -> list:
         [(half_x - DRAIN_WALL_MARGIN, half_y - dy), (DRAIN_TARGET_HALF_WIDTH, half_y)],
     ]
 
-# 2026-09-13、ユーザー提供の設計指示書に基づく新terrain: pin_wall。ユーザー指定により
-# 「内部地形として追加」ではなく「外枠限定」で採用する。hourglassが外枠そのものを砂時計形状に
+# 自作の設計仕様書に基づく新terrain: pin_wall。「内部地形として追加」ではなく
+# 「外枠限定」で採用する。hourglassが外枠そのものを砂時計形状に
 # 置き換える特殊terrainであるのと同じ位置づけで、外枠(square/circleの壁)そのものを、隣り合う
 # 円が重なり合う密度の小さなピンの列に置き換える(内部空間には別途何も敷き詰めない)。
 # フラットな壁と違い、当たった位置によって跳ね返る角度が読めないため、外周に当たるだけでも
-# 予測不能さが生まれる(指示書1章の「サプライズ指数」の狙いを外枠自体で実現する)。
+# 予測不能さが生まれる(設計仕様書1章の「サプライズ指数」の狙いを外枠自体で実現する)。
 # 壁の輪郭は_wall_local_segments(shape, hole_width, half_x, half_y)と完全に共有しているため、
 # hole_fallの穴・spawn安全判定・脱落判定など、既存のshapeベースの判定はそのまま使い回せる
 # (hourglassのように別途専用の境界判定関数を用意する必要がない)。
-PIN_WALL_RADIUS = CIRCLE_RADIUS * 0.3  # 指示書「プレイヤー半径の0.25〜0.35倍」の中央値
+PIN_WALL_RADIUS = CIRCLE_RADIUS * 0.3  # 設計仕様書「プレイヤー半径の0.25〜0.35倍」の中央値
 PIN_WALL_OVERLAP_RATIO = 0.85  # ピンの中心間隔 = 直径 * この比率(1.0未満にして隙間なく重ねる)
-PIN_WALL_RESTITUTION = 1.15  # 指示書の「1.1〜1.3程度」の下寄り
+PIN_WALL_RESTITUTION = 1.15  # 設計仕様書の「1.1〜1.3程度」の下寄り
 # 2026-09-09に判明した「反発係数を1.0超にすると衝突のたびに運動エネルギーが増え続け、
 # 加速したプレイヤーが1フレームで壁をすり抜ける」不具合(776行目付近のコメント参照)と
 # 同じ罠を踏まないよう、pin_wall選択時は毎フレームこの上限で速度をクランプする安全弁を設ける
-# (simulate()のメインループ、space.step直後を参照)。指示書のPEG_RESTITUTIONを素の反発係数の
+# (simulate()のメインループ、space.step直後を参照)。設計仕様書のPEG_RESTITUTIONを素の反発係数の
 # まま採用しつつ、このクランプで無限にエネルギーが増え続ける事態だけを防ぐ。
 PIN_WALL_MAX_SPEED = 900.0 * _ARENA_SCALE
 PIN_WALL_COLOR = (225, 225, 235)  # ピンボール実機の金属ポストを意識した銀白色
@@ -499,12 +499,12 @@ def _terrain_obstacles(terrain: str | None, half_x: float, half_y: float) -> tup
         ]
         return chains, []
     if terrain == "two_tier":
-        # 2026-09-20、ユーザー指示: 「2段式ステージ」。上段に3つの足場(枝分かれ)を浮かせ、
+        # 「2段式ステージ」。上段に3つの足場(枝分かれ)を浮かせ、
         # 各足場の先端付近に武器を置く(実際の配置は_two_tier_weapon_position、スポーンは
         # spawn_circles側で分岐)。足場には端があり、そこから落ちると自然に重力で下段(本戦の
         # 広いエリア)へ落下する─という仕組みを、追加の特別な「落下判定」なしで実現できる
         # (単に足場を宙に浮いた短い床として置くだけで、はみ出れば普通に落ちる)。
-        # 2026-09-20追記、ユーザー指示: 平らな板(長方形)ではなく「間に滑らせる前提で三角形」に
+        # 平らな板(長方形)ではなく「間に滑らせる前提で三角形」に
         # 変更。3点の折れ線(低い端→頂点→低い端)にするだけで、_chains_to_segments/_draw_terrain
         # 側は既存の汎用ロジック(chainを連続セグメント化/1本の折れ線として描画)がそのまま
         # 山型として機能する(専用コード追加は不要)。
@@ -513,7 +513,7 @@ def _terrain_obstacles(terrain: str | None, half_x: float, half_y: float) -> tup
             [(cx - hl, edge_y), (cx, peak_y), (cx + hl, edge_y)] for cx, edge_y, hl, peak_y in platforms
         ], []
     if terrain == "split_horizontal":
-        # 2026-09-20、ユーザー指示: 「上下分断ステージ」(gun_duel専用)。既存の外枠(左右・上下の
+        # 「上下分断ステージ」(gun_duel専用)。既存の外枠(左右・上下の
         # 壁)はそのまま使い、内部に2本の仕切り(上下対称)を追加するだけで、上下に同じ大きさの
         # 陣地+中央の隙間、という構成を実現する(外枠を丸ごと置き換えるhourglass等より安全)。
         # 弾は物理演算に乗せない直進判定(このファイル内コメント参照)のため、この仕切りに
@@ -551,14 +551,14 @@ def _hourglass_boundary_chain(half_x: float, half_y: float) -> list:
     """砂時計そのものが外枠になる場合の、閉じた境界の頂点列(中心(0,0)基準ローカル座標、
     上端の中点から始まり上端の中点に戻って閉じる8点)。
 
-    2026-09-09(ユーザー報告のバグ調査で発見): 以前は「上左角」を始点・終点にしていたため、
+    バグ調査で発見: 以前は「上左角」を始点・終点にしていたため、
     draw.line(..., joint="curve")では始点=終点の"wrap-around"部分(実際には上左角という
     本物の角)がPILの内部joint処理の対象にならず、そこだけ丸め処理が効かずくぼみが残っていた
     (他の5つの角は内部joint扱いになるため正しく丸められていた)。始点・終点を実際には
     「曲がっていない」直線区間である上端の中点に変更することで、全ての本物の角(6箇所)が
     内部jointとして扱われ、くぼみが解消する(始点=終点の場所自体は元々まっすぐな辺の途中
     なので、丸め処理の有無に関わらず見た目に影響しない)。
-    縦方向のサイズはHOURGLASS_HEIGHT_RATIOで拡大する(ユーザー要望)。"""
+    縦方向のサイズはHOURGLASS_HEIGHT_RATIOで拡大する。"""
     choke = CIRCLE_RADIUS * CHOKE_WIDTH_RATIO / 2
     wide_half = half_x * HOURGLASS_WIDTH_RATIO
     eff_half_y = half_y * HOURGLASS_HEIGHT_RATIO
@@ -589,7 +589,7 @@ def _point_in_hourglass(x: float, y: float, half_x: float, half_y: float, margin
     if ay > eff_half_y - margin:
         return False
     # y=0(ネック)でchoke、y=half_y(外側)でwide_halfへ線形補間した、その高さでの壁のx位置。
-    # 2026-09-09(ユーザー報告のバグ調査で発見): 以前はこの補間が逆向き(ネックで広く、外側で
+    # バグ調査で発見: 以前はこの補間が逆向き(ネックで広く、外側で
     # 狭く判定)になっており、_hourglass_boundary_chainの実際の壁ジオメトリと不一致だった。
     # ネック付近で本来より広く「内側」と誤判定するため、スポーンした/移動中のプレイヤーが
     # 実際の壁をすり抜けて枠外に出るケースがあった(実機シミュレーションで確認・特定)。
@@ -621,7 +621,7 @@ def _point_segment_distance(px: float, py: float, ax: float, ay: float, bx: floa
 
 def _in_arena_bounds(x: float, y: float, arena_shape: str, terrain: str | None, half_x: float, half_y: float, margin: float) -> bool:
     """ワールド座標(x,y)が、地形を考慮した実際のプレイ可能領域の内側(margin分の余白込み)か
-    どうかを判定する。2026-09-09、ユーザー指摘対応: teleport/poison_wireの配置先選びが
+    どうかを判定する。teleport/poison_wireの配置先選びが
     この判定を一切していなかったため、donutの中心障害物やhourglassの非矩形な境界の外側に
     配置されてしまう不具合があった。spawn_circlesの_sample_positionと共通のロジックを関数化した。"""
     lx, ly = x - ARENA_CX, y - ARENA_CY
@@ -648,20 +648,20 @@ def _overlaps_terrain_obstacles(x: float, y: float, terrain_segments: list, terr
     return False
 
 
-# area_control専用: 保護ゾーン(2026-09-09、ユーザー要望)。「安全地帯が縮むだけで張り合いがない」
+# area_control専用: 保護ゾーン(2026-09-09)。「安全地帯が縮むだけで張り合いがない」
 # という指摘への対応として、安全地帯の内側に数秒ごとに小さな保護ゾーンが出現し、触れたプレイヤーを
 # 一定時間だけ安全地帯の外に出ても脱落しないよう保護する(逆転の可能性を作る駆け引き要素)。
 # food/gun等と同じ「位置情報+距離判定のみ、専用pymunkボディは持たない」軽量パターンで実装する。
 PROTECTION_ZONE_RADIUS = 45.0 * _ARENA_SCALE  # 未捕獲時のピックアップ判定・表示半径
 # 2026-09-09(訂正): 保護ゾーンは「プレイヤーが一定時間無敵で自由に動ける」のではなく、
 # 「固定座標のまま実体化し、プレイヤーをその中に閉じ込める(物理的な囲い)」仕様に訂正
-# (ユーザー指摘)。実体化後の囲いの半径はピックアップ半径より大きくし、捕獲判定の瞬間に
+# 。実体化後の囲いの半径はピックアップ半径より大きくし、捕獲判定の瞬間に
 # プレイヤーが確実に囲いの内側に収まるようにする。
 PROTECTION_CAGE_RADIUS = PROTECTION_ZONE_RADIUS * 1.8
 PROTECTION_ZONE_INTERVAL_SECONDS = 4.0  # 消化後、次が出現するまでの間隔(食べ物より少し長め)
-PROTECTION_ZONE_DURATION_SECONDS = 4.0  # 実体化後、囲いが持続する秒数(ユーザー指定)
+PROTECTION_ZONE_DURATION_SECONDS = 4.0  # 実体化後、囲いが持続する秒数
 PROTECTION_ZONE_INITIAL_DELAY_SECONDS = 2.0  # 開幕直後の出現は忙しないため少し間を置く
-# 2026-09-09、ユーザー指摘対応: 以前は誰も取らない限りいつまでも同じゾーンが残り続け、
+# 以前は誰も取らない限りいつまでも同じゾーンが残り続け、
 # 「次のゾーンが出現しない」問題があった(未消化のまま無期限に居座っていた)。数秒間
 # 誰にも捕獲されなければ消滅し、通常の間隔を置いて次のゾーンが出現するようにする。
 PROTECTION_ZONE_LIFESPAN_SECONDS = 3.5
@@ -669,7 +669,7 @@ PROTECTION_ZONE_LIFESPAN_SECONDS = 3.5
 
 def _cage_local_segments(shape: str, radius: float) -> list:
     """保護ゾーンが実体化した際の囲いのローカル座標セグメント(中心(0,0)基準)。
-    「枠とおなじ形状」(ユーザー指定)にするため、外枠のshapeパラメータをそのまま使う。
+    「枠とおなじ形状」にするため、外枠のshapeパラメータをそのまま使う。
     常に隙間なし(hole_width=0相当)の密閉形状にする。"""
     if shape == "square":
         s = radius
@@ -679,7 +679,7 @@ def _cage_local_segments(shape: str, radius: float) -> list:
     pts = [(radius * math.cos(a), radius * math.sin(a)) for a in angles]
     return [(pts[i], pts[i + 1]) for i in range(n)]
 
-# 2026-09-12、ユーザー提供の設計指示書に基づき全面改修: 旧来の「ズームイン保持→直進移動→
+# 2026-09-12、自作の設計仕様書に基づき全面改修: 旧来の「ズームイン保持→直進移動→
 # ズームアウト」3フェーズ(合計2.6秒)を廃止し、波紋(shockwave ring)による瞬時リセット方式
 # (0.5秒)に短縮した。しかし実機確認で「全員が瞬間ワープするのはループ演出として不自然」との
 # フィードバックを受け、同日中に折衷案へ再修正: 波紋の演出はそのまま活かしつつ、瞬間ワープを
@@ -691,7 +691,7 @@ EPILOGUE_FRAMES = round(EPILOGUE_SECONDS * FPS)
 # 大幅短縮)。この後(HOLD_END〜1.0)が、全員(脱落済み含む)が滑らかに初期位置へ戻る移動フェーズ。
 EPILOGUE_HOLD_END = 0.22
 EPILOGUE_RING_WIDTH = 6.0  # 波紋の線の太さ(scale倍する)
-# 2026-09-21、ユーザー指示「WIN表示のディレイとフェード」対応: 決着後0.5秒(phase_t換算)
+# 決着後0.5秒(phase_t換算)
 # までWIN等のテキストを一切表示せず、そこからほぼ瞬間的に出現して0.3秒で即座にフェードアウト
 # させる(=表示自体は決着後0.5〜0.8秒の間だけ)。「表示され続ける=もうすぐ終わる」という
 # 合図でスワイプを誘発しないよう、旧来の「決着直後に出現し終盤までずっと表示」仕様
@@ -725,7 +725,7 @@ SLOWMO_FACTOR = 3
 ABILITY_BY_COLOR_INDEX = {
     0: "shockwave",      # 赤: 周囲の相手を吹き飛ばす
     1: "vortex",         # 青: 周囲の相手を自分の方へ引き寄せる(2026-09-09、旧freezeから変更。
-                         # 減速のみの効果は終盤の見栄えを悪くするとのユーザー指摘のため、
+                         # 減速のみの効果は終盤の見栄えを悪くするという問題があったため、
                          # 「相手を強制的に遅くする」のではなく「衝突を誘発する」引き寄せ効果に変更。
                          # 今後も強制減速のみの効果は導入しない方針)
     2: "growth_surge",   # 緑: 自分が一時的に巨大化する
@@ -738,9 +738,9 @@ ABILITY_BY_COLOR_INDEX = {
 ABILITY_BASE_INTERVAL = 4.5
 ABILITY_JITTER = 0.7
 
-# 2026-09-21、ユーザー指示「カラーパレットの記号化」対応: 色と物理特性の役割を固定化し、
+# 色と物理特性の役割を固定化し、
 # 視聴者の認知負荷を下げる(「あの色は速い」「あの色は大きい」を繰り返し見て学習できるように)。
-# 指示書で具体例が挙がった3色(赤=攻撃的・初速大、青=巨大・遅い、緑=逃げる)のみ定義し、
+# 設計仕様書で具体例が挙がった3色(赤=攻撃的・初速大、青=巨大・遅い、緑=逃げる)のみ定義し、
 # 他の5色(黄/紫/ティール/オレンジ/グレー)は無理に役割をこじつけず既存の能力の個性(dash等)
 # のままにする。speed_mult/size_multは開幕時のみ適用(_apply_color_traits参照)、
 # fleeは試合中ずっと効く継続的な回避挙動(_apply_flee_behavior参照)。
@@ -767,16 +767,16 @@ SLAM_BOOST = 520.0
 
 # absorb_growth専用: 「どちらが吸収するのか」を説明なしでわからせるための食べ物パワーアップ。
 # ランダムな位置に出現し、触れると一定時間だけ相手を吸収できるようになる
-# (2026-09-09、ユーザー要望。以前は常に大きい方が勝つだけで分かりにくかった)。
+# (。以前は常に大きい方が勝つだけで分かりにくかった)。
 FOOD_PICKUP_RADIUS = 22.0 * _ARENA_SCALE
 EMPOWERED_DURATION_SECONDS = 3.0
-# 2026-09-16、冒頭フック強化(ユーザー指示): 以前は「開幕直後に出現すると忙しない」ため
+# 2026-09-16、冒頭フック強化: 以前は「開幕直後に出現すると忙しない」ため
 # 1.0秒の間を置いていたが、Frame 0時点で目的(奪い合うもの)が見えている方が離脱防止に
 # 優先すると判断し、即時出現(0秒)に変更した。
 FOOD_INITIAL_DELAY_SECONDS = 0.0
 FOOD_RESPAWN_DELAY_SECONDS = 1.5  # 食べられてから次が出現するまでの間隔
 
-# absorb_growth専用: 早期決着を抑えるための2026-09-08追加ルール(ユーザー指摘対応)。
+# absorb_growth専用: 早期決着を抑えるための2026-09-08追加ルール。
 # 1) 吸収可能な状態(empowered)は、他プレイヤーを1体吸収した時点で即座に解除する
 #    (同じ食べ物1個で連鎖的に何体も吸収できてしまうと瞬殺劇場になるため)。
 # 2) 自分より大きい相手は吸収しきれない。吸収可能な状態でも自分より大きい相手に触れた場合は
@@ -785,11 +785,11 @@ ABSORB_PARTIAL_STEP = 0.12  # 「一段階」の半径変化率
 ABSORB_MIN_RADIUS = CIRCLE_RADIUS * 0.45  # かじり取られる側が縮みすぎて不安定にならないための下限
 
 # goal_reach専用: ゴールの周りをバリアで囲み、何度か体当たりして破壊してからでないと
-# 到達(勝利)できないようにする(2026-09-08、ユーザー要望)。
+# 到達(勝利)できないようにする(2026-09-08)。
 BARRIER_HITS_TO_BREAK = 3
 BARRIER_RADIUS_MULT = 1.6  # GOAL_RADIUSに対する希望倍率。上端の壁とぶつからないよう下で実際にはクランプする
 
-# gun_duel専用: 「銃奪い取り型」新ルール(2026-09-08、ユーザー要望で新規追加)。
+# gun_duel専用: 「銃奪い取り型」新ルール(新規追加)。
 # 銃に触れると一番近い相手へ照準し続け、GUN_AIM_SECONDS秒後に自動発射して弾を失う。
 # シールドに触れるとSHIELD_DURATION_SECONDS秒だけ弾が効かなくなる(シールドは銃より低頻度)。
 # 2026-09-09、尺ターゲット20〜40秒→15〜25秒への短縮に伴い、銃/シールドのサイクルを大幅に
@@ -797,7 +797,7 @@ BARRIER_RADIUS_MULT = 1.6  # GOAL_RADIUSに対する希望倍率。上端の壁�
 # 率が高いまま(実測40シード中約33%)残っており、gun_duelはこの尺ターゲットに対して
 # 依然として最も弱いルールという既知の課題(タイマー調整だけでは解決しきらなかった)。
 GUN_AIM_SECONDS = 1.0
-# 2026-09-16、冒頭フック強化(ユーザー指示): 銃は「奪い合いの目的」を即座に見せる主役
+# 2026-09-16、冒頭フック強化: 銃は「奪い合いの目的」を即座に見せる主役
 # アイテムのため0秒即時出現に変更。シールドは防御系の副次アイテムのため、従来通り
 # 少し間を置いて段階的に情報を出す(忙しなさ回避)方針を維持する。
 GUN_INITIAL_DELAY_SECONDS = 0.0
@@ -839,20 +839,20 @@ def _lead_aim_angle(cx: float, cy: float, tx: float, ty: float, tvx: float, tvy:
 
 SHIELD_DURATION_SECONDS = 4.0
 SHIELD_INITIAL_DELAY_SECONDS = 1.5  # 銃より遅らせて段階的に情報を出す(2026-09-16、忙しなさ回避のため維持)
-SHIELD_RESPAWN_DELAY_SECONDS = 2.5  # 銃より低頻度に出現(ユーザー指定の相対関係は維持)
+SHIELD_RESPAWN_DELAY_SECONDS = 2.5  # 銃より低頻度に出現させる(相対関係を維持)
 
 # ============================================================
-# weapon_colosseum: 新ルール(2026-09-20、ユーザー指示)。
+# weapon_colosseum: 新ルール(2026-09-20)。
 # 剣/槍/ハンマー/弓矢/筆/斧の6種の武器を奪い合い、HP(10)を削り合う対戦形式。
 # 他ルールの「1回の接触/場外/侵入で即脱落」とは異なり、HPが0になるまで生存する
 # (decided_frame/winner_idの判定自体は既存の「生存者1人になったら決着」ロジックを
 # そのまま流用でき、weapon_colosseum専用の分岐は不要 = _iter_rendered_frames以降の
 # 決着処理コードに手を加える必要がない)。
 # ============================================================
-WEAPON_KINDS = ["sword", "spear", "hammer", "bow", "axe"]  # 2026-09-20、ユーザー指示で筆(brush)を廃止
+WEAPON_KINDS = ["sword", "spear", "hammer", "bow", "axe"]  # 筆(brush)を廃止
 WEAPON_STARTING_HP = 10
 WEAPON_INITIAL_DELAY_SECONDS = 0.0
-# 2026-09-20、ユーザー指示により「1ゲーム内での武器の再出現はなし(無駄に散らかる)。
+# 「1ゲーム内での武器の再出現はなし(無駄に散らかる)。
 # 一度所持した武器はずっと持つ」仕様に変更。各種類1回だけ出現させ、拾われても再出現
 # させない(simulate()内のweapon_ever_spawned参照)。以前あったWEAPON_RESPAWN_DELAY_SECONDS
 # (再出現間隔)は不要になったため削除した。
@@ -860,24 +860,24 @@ WEAPON_PICKUP_RADIUS = FOOD_PICKUP_RADIUS
 
 # ============================================================
 # 対戦形式(match_type): 個人戦(individual、既定)/チーム戦(team)/ボス戦(boss)
-# 2026-09-21、ユーザー指示「新軸」対応。既存のrule(勝敗条件のロジック)とは独立した軸。
+# 「新軸」対応。既存のrule(勝敗条件のロジック)とは独立した軸。
 # チーム戦はhole_fall/goal_reach/area_control/gun_duel/weapon_colosseumの5ルールに、
 # ボス戦はweapon_colosseum/gun_duelの2ルールに対応させる(absorb_growthはそもそも
 # 「接触で吸収・成長する」ことがゲーム性の中心でチーム制と相性が悪いため対象外、
-# の2点ともユーザー確定済み)。
+# の2点とも仕様として確定している)。
 # ============================================================
 BOSS_SIZE_MULT = 1.7  # 「ふたまわり大きい」の目安。物理半径にもそのまま反映する(_resize_entity使用)
 BOSS_HP_MULT = 3.0  # weapon_colosseum専用: ボスのHPを通常の3倍にする(有利ステータス)
 BOSS_BULLET_HITS_TO_ELIMINATE = 3  # gun_duel専用: ボスは弾を3発受けるまで脱落しない(有利ステータス)
 
-# 2026-09-20、ユーザー指示で筆(brush)を廃止した影響で総ダメージ量が減り、決着の尺が
+# 筆(brush)を廃止した影響で総ダメージ量が減り、決着の尺が
 # 伸びた(中央値21.8秒→27.4秒、目標15〜25秒)ため、全武器のクールダウンを0.7倍に再調整した
 # (実測80シード: undecided=0、median=22.1秒、目標レンジ到達60/80)。
 # 2026-09-21追記: 近接武器(剣/槍/ハンマー)のクールタイムを「攻撃側個体」単位から
 # 「(攻撃側,対象)の組み合わせ」単位に変更(複数の相手を同時期に攻撃できるように)した影響で
 # 総ダメージ量が増え、決着が速くなりすぎた(median15.2秒)ため、全武器のクールダウンを
 # さらに1.7倍に再調整した(実測100シード: undecided=0、median=19.9秒、目標レンジ到達62/100)。
-# 2026-09-21再追記(ユーザー指示「数十回シミュレーションしてバランス調整」): 250シードで
+# 数十回シミュレーションしてバランスを検証: 250シードで
 # 勝者が最後に保持していた武器を集計したところ、槍が52.7%を占める一方でハンマーは10%と
 # 大きく偏っていた(主な原因は槍の射程4.2rが他の近接武器の2.6rよりずっと長く、常時有効
 # だったこと)。槍の射程を短縮し、ハンマーはダメージを1→2に引き上げた上でクールダウンを
@@ -886,7 +886,7 @@ BOSS_BULLET_HITS_TO_ELIMINATE = 3  # gun_duel専用: ボスは弾を3発受け�
 SWORD_DAMAGE = 2
 SWORD_RANGE = CIRCLE_RADIUS * 2.6
 SWORD_COOLDOWN_SECONDS = 2.46
-SWORD_SPIN_SPEED = 6.0  # rad/秒。見た目の回転のみで当たり判定には影響しない(指示書「回転する」への対応)
+SWORD_SPIN_SPEED = 6.0  # rad/秒。見た目の回転のみで当たり判定には影響しない(設計仕様書「回転する」への対応)
 
 SPEAR_DAMAGE = 2
 SPEAR_WALL_BONUS_DAMAGE = 1  # 壁に押し付けた状態で命中すると合計3
@@ -908,7 +908,7 @@ ARROW_RADIUS = 7.0 * _ARENA_SCALE
 ARROW_MAX_SECONDS = 2.0
 BOW_RECOIL = 260.0 * _ARENA_SCALE  # 発射の反動で射手が逆方向へ押される
 
-# 2026-09-21、ユーザー指示で斧の挙動を全面刷新(3回目、最終版): 「基本は止めて、定期的に
+# 斧の挙動を全面刷新(3回目、最終版): 「基本は止めて、定期的に
 # 当たり判定・ぶっ飛ばし判定つきの高速回転をする」というシンプルな仕様に変更した。
 # 静止中は他の近接武器と同じ汎用の構え(狙っている相手の方向)で表示し、一定間隔で
 # 剣/ハンマーの周回演出を大幅に速くしたような高速回転攻撃を行う。回転中に届く範囲内の
@@ -922,9 +922,9 @@ AXE_KNOCKBACK = 600.0 * _ARENA_SCALE
 AXE_COOLDOWN_SECONDS = 2.06  # 2026-09-21、バランス調整で短縮(出番が少なく勝率が低かったため)
 AXE_HELD_OFFSET_MULT = 1.7  # 「より前に出す」ための保持位置オフセット倍率(他の近接武器の1.0倍より大きい)
 
-# 2026-09-21、ユーザー指示: ヒットストップは「速度を1回ゼロにするだけ」だと、命中のたびに
+# ヒットストップは「速度を1回ゼロにするだけ」だと、命中のたびに
 # 運動量を完全に失ってしまい(その後は重力/衝突で一から速度を作り直すしかない)、命中回数の
-# 多い試合ほど終盤に動きが鈍くなっていく問題があった。ユーザー提案の「直前の速度を保存して
+# 多い試合ほど終盤に動きが鈍くなっていく問題があった。「直前の速度を保存して
 # おき、短時間ゼロにした後に保存していた速度(+その間に本来受けていたはずの重力分)を
 # 復元する」方式に変更し、見た目上は一瞬静止するが運動量は失われないようにする。
 HITSTOP_FRAMES = 4
@@ -988,7 +988,7 @@ PALETTES = {
     ],
     # 2026-09-09修正: 旧sunsetは暖色に寄せすぎて色相の並び(赤/青/緑/黄/紫/ティール/橙/灰)が
     # 他パレットと揃っておらず(例: 本来「青」枠のindex1が紫になっていた)、同じ能力が
-    # パレットによって別の色系統に見えてしまっていた(ユーザー指摘: 色と能力を対応させること)。
+    # パレットによって別の色系統に見えてしまっていた(色と能力を対応させること)。
     # 「夕焼け」の温かみを保ちつつ、各indexの色相ファミリーは他パレットと揃えて修正した。
     "sunset": [
         (233, 90, 80),   # 赤
@@ -1027,7 +1027,7 @@ class CircleEntity:
     hp: int = WEAPON_STARTING_HP  # weapon_colosseum専用: 0になった時点で脱落
     weapon: str | None = None  # weapon_colosseum専用: 保持中の武器種(WEAPON_KINDS)
     weapon_cooldown_until_frame: int = -1  # weapon_colosseum専用: この値のフレームまで次の攻撃ができない
-    # weapon_colosseum(斧)専用: 2026-09-21、ユーザー指示で全面刷新(3回目)。基本は静止、
+    # weapon_colosseum(斧)専用: 全面刷新(3回目)。基本は静止、
     # 一定間隔で高速回転する攻撃(当たり判定+ぶっ飛ばし判定つき)を行う、というシンプルな
     # 仕様に変更した。この値のフレームまで高速回転(攻撃中)する。
     axe_spin_until_frame: int = -1
@@ -1035,7 +1035,7 @@ class CircleEntity:
     hitstop_until_frame: int = -1  # weapon_colosseum専用: 命中の瞬間からこの値のフレームまで速度を凍結する
     hitstop_saved_vx: float = 0.0  # weapon_colosseum専用: 凍結前の速度(x)。解除時に復元する
     hitstop_saved_vy: float = 0.0  # weapon_colosseum専用: 凍結前の速度(y)。解除時に復元する
-    # 2026-09-21、ユーザー指示「対戦形式(match_type)の新軸」対応。
+    # 「対戦形式(match_type)の新軸」対応。
     # team_id: チーム戦(match_type="team")専用。個人戦/ボス戦ではNoneのまま
     # (Noneは「誰とも同じチームでない」を意味し、_is_teammate()が常にFalseを返す)。
     team_id: int | None = None
@@ -1097,7 +1097,7 @@ def _wall_local_segments(shape: str, hole_width: float, half_x: float = ARENA_HA
     """枠(壁)のローカル座標セグメント一覧。物理演算・描画の両方でこれを共有する
     (別々に持つと、パラメータを変えたときに片方だけ古い値のまま、というバグの元になる)。
 
-    2026-09-09、ユーザー要望により真円/正方形(縦横ともARENA_HALF_EXTENT)に変更した。
+    真円/正方形(縦横ともARENA_HALF_EXTENT)に変更した。
     以前はARENA_CX(横)/ARENA_CY(縦)を別々に使う縦長の楕円/矩形で、回転すると
     キャンバス端で見切れる問題があったが、真円/正方形なら見切れない
     (円は回転で輪郭が変わらない、正方形は対角線がARENA_Wにちょうど収まるサイズにしてある)。
@@ -1170,7 +1170,7 @@ def build_space(
     space.add(arena_body)
 
     if terrain == "hourglass":
-        # 2026-09-09、ユーザー要望: 通常の四角/円の壁は作らず、砂時計のシルエットそのものを
+        # 通常の四角/円の壁は作らず、砂時計のシルエットそのものを
         # 外枠にする(_hourglass_boundary_chain、始点に戻って閉じた1本の折れ線)。
         chain = _hourglass_boundary_chain(half_x, half_y)
         for i in range(len(chain) - 1):
@@ -1209,7 +1209,7 @@ def build_space(
         obstacle_shape = pymunk.Circle(arena_body, r, (cx, cy))
         obstacle_shape.friction = friction
         if terrain == "pinball":
-            # 2026-09-13、指示書対応: ポップバンパーはPINBALL_BUMPER_RESTITUTION(1.3〜1.5)で
+            # 2026-09-13、設計仕様書対応: ポップバンパーはPINBALL_BUMPER_RESTITUTION(1.3〜1.5)で
             # 積極的に弾き飛ばす。2026-09-09に判明した「反発係数>1.0だと運動エネルギーが
             # 際限なく増え続け壁をすり抜ける」不具合(このすぐ下のコメント参照)を踏まないよう、
             # terrain=="pinball"選択時は毎フレームPINBALL_MAX_SPEEDで速度をクランプする安全弁を
@@ -1218,7 +1218,7 @@ def build_space(
             obstacle_shape.elasticity = PINBALL_BUMPER_RESTITUTION
             obstacle_shape.collision_type = 8
         else:
-            # 2026-09-09(ユーザー指摘で修正): 反発係数を1.0超にすると衝突のたびに運動エネルギーが
+            # 2026-09-09(修正): 反発係数を1.0超にすると衝突のたびに運動エネルギーが
             # 増え続け、加速したプレイヤーが1フレームで外壁を通り抜けてしまう(壁の外に出て
             # そのまま決着してしまう)不具合があった。他の壁と同じelasticityを使い、
             # 「速度が上がらずそのまま跳ね返る」仕様に修正。
@@ -1227,7 +1227,7 @@ def build_space(
         space.add(obstacle_shape)
 
     if terrain == "pinball":
-        # 2026-09-13、指示書対応: スリングショットは通常のterrain_chains(誘導スロープ)とは
+        # 2026-09-13、設計仕様書対応: スリングショットは通常のterrain_chains(誘導スロープ)とは
         # 別枠で追加し、SLINGSHOT_RESTITUTION(高反発)を個別に適用する
         # (誘導スロープは滑らせて中央へ誘導する役割のため、通常のelasticityのまま据え置く)。
         for a, b in _pinball_slingshot_chains(half_x, half_y):
@@ -1266,16 +1266,16 @@ def _make_player_shape(body: pymunk.Body, radius: float, player_shape: str) -> p
 def _player_moment(mass: float, radius: float, player_shape: str) -> float:
     if player_shape == "circle":
         return pymunk.moment_for_circle(mass, 0, radius)
-    # 2026-09-08、ユーザー指摘により修正: 四角形は重力の影響こそ受けないが、回転は固定せず
+    # 修正: 四角形は重力の影響こそ受けないが、回転は固定せず
     # 通常の慣性モーメントにする(衝突等の外力に応じて回転できるようにする)。一時無回転にして
-    # いたが、ユーザーの意図は「無回転」ではなく「重力に引っ張られない・直進して反射する」
+    # いたが、本来の狙いは「無回転」ではなく「重力に引っ張られない・直進して反射する」
     # ことだったため、square専用の分岐(float("inf"))は撤廃し、他形状と同じ計算式を使う。
     verts = _poly_vertices(player_shape, radius)
     return pymunk.moment_for_poly(mass, verts)
 
 
 def _no_gravity_velocity_func(body: pymunk.Body, gravity: tuple, damping: float, dt: float) -> None:
-    """player_shape="square"専用(2026-09-08、ユーザー要望): 重力の影響を受けず常に直進させる。
+    """player_shape="square"専用(2026-09-08): 重力の影響を受けず常に直進させる。
     pymunkの既定の速度更新(Body.update_velocity)からgravity項だけを除いたもの。
     壁や相手プレイヤーとの衝突による反射(弾性衝突)は通常のpymunk物理演算がそのまま処理するため、
     ここでは減衰(damping)だけ適用すればよい。"""
@@ -1330,19 +1330,19 @@ def spawn_circles(
     # 2026-09-08: tall等の非等方ステージに対応するため楕円の内外判定に一般化。
     mx, my = half_x - margin, half_y - margin
 
-    # 2026-09-09、ユーザー指示: goal_reachで、開始直後にバリア(GOAL_RADIUS*BARRIER_RADIUS_MULT)へ
+    # goal_reachで、開始直後にバリア(GOAL_RADIUS*BARRIER_RADIUS_MULT)へ
     # 密着スポーンして即座に体当たりで破壊→ゴール、という「つまらない決着」を物理的に禁止する。
     # ゴール・バリアは回転しない(space.static_body、arena_bodyの回転に追従しない)ため、
     # スポーン時点の固定距離チェックで恒久的に安全(rotation_speedの影響を受けない)。
     goal_point = layout["goal_point"]
     min_goal_distance = (GOAL_RADIUS * BARRIER_RADIUS_MULT + CIRCLE_RADIUS + 60 * _ARENA_SCALE) if rule == "goal_reach" else 0.0
-    # 2026-09-09、ユーザー要望でhourglassが外枠そのものになったため、arena_shape(square/circle)
+    # hourglassが外枠そのものになったため、arena_shape(square/circle)
     # 基準の内外判定は使えない。_point_in_hourglassを唯一の内外判定として使う。
     hourglass_margin = CIRCLE_RADIUS + 15 * _ARENA_SCALE
     _band_cursor = [0]  # two_tier/split_horizontalの交互配置に使う(閉じ込め済みの変数)
 
     def _sample_position() -> tuple[float, float]:
-        # 2026-09-20、ユーザー指示: two_tier/split_horizontalは、ランダム抽選+当たり判定
+        # two_tier/split_horizontalは、ランダム抽選+当たり判定
         # 回避ではなく、意図した位置(足場の上/上下どちらかの陣地)に直接決定論的に配置する
         # (ランダム抽選だと大半のプレイヤーが足場を外れて即落下したり、陣地の偏りが
         # 起きたりするため)。
@@ -1351,8 +1351,8 @@ def spawn_circles(
             pcx, edge_y, phl, peak_y = platforms[_band_cursor[0] % len(platforms)]
             _band_cursor[0] += 1
             # 2026-09-20、三角形化(山型)に伴い、スポーン地点を足場全体への一様ジッターから
-            # 頂点付近に変更(ユーザー指示「上段でスポーン」→頂点から左右どちらかの斜面へ
-            # 滑り落ちる「枝分かれ」の起点にする)。同じ足場に複数人乗ることもあるため、
+            # 頂点付近に変更(頂点から左右どちらかの斜面へ滑り落ちる「枝分かれ」の起点に
+            # する狙い)。同じ足場に複数人乗ることもあるため、
             # 重なり回避の小さなジッターだけ与える。
             jitter = rng.uniform(-phl * 0.15, phl * 0.15)
             return ARENA_CX + pcx + jitter, ARENA_CY + peak_y - CIRCLE_RADIUS - 12 * _ARENA_SCALE
@@ -1424,7 +1424,7 @@ def spawn_circles(
         shape.elasticity = elasticity
         shape.collision_type = 2
         space.add(body, shape)
-        # 2026-09-21、match_type="team"専用: 「同じ色で2〜3チーム」というユーザー指示通り、
+        # 2026-09-21、match_type="team"専用: 「同じ色で2〜3チーム」
         # チーム戦では色(=能力も連動)をエンティティ個別ではなくチーム単位で割り当てる
         # (team_id自体は色とは独立したフィールドなので、フレンドリーファイア判定
         # (_is_teammate)は色に依存しない。色を揃えるのはあくまで視覚的にチームを
@@ -1441,7 +1441,7 @@ def spawn_circles(
         )
         entity.ability = ABILITY_BY_COLOR_INDEX.get(color_index % len(COLORS))
         if entity.ability == "teleport" and rule == "goal_reach":
-            # 2026-09-08、ユーザー指示: ゴール到達型のルールにワープ系スキルは禁止
+            # ゴール到達型のルールにワープ系スキルは禁止
             # (ゴール直前でのワープが到達判定と相性が悪い/ずるく見えるため)。
             # 色↔能力の対応は他ルールと常に一致させる方針(5章)のため、他の能力に差し替えず
             # 「このルールでは無効」として単純に発動しないようにする。
@@ -1453,7 +1453,7 @@ def spawn_circles(
         # 「2種類のスキル持ち」のボスにする。他のプレイヤーには一切手を加えない。
         if match_type == "boss" and i == 0:
             entity.is_boss = True
-            # 2026-09-21、ユーザー指示「カラーパレットの記号化」対応: 「青=巨大・遅い」の
+            # 「青=巨大・遅い」の
             # 役割をボスと一致させ、色の意味を統一する(ボスは常に青系の見た目になる)。
             entity.color_index = 1
             entity.color = palette_colors[1 % len(palette_colors)]
@@ -1468,7 +1468,7 @@ def spawn_circles(
                 entity.hp = int(WEAPON_STARTING_HP * BOSS_HP_MULT)
             _resize_entity(space, entity, CIRCLE_RADIUS * boss_size_mult, elasticity, friction)
 
-        # 2026-09-21、ユーザー指示「カラーパレットの記号化」対応: 色ごとの物理特性(初速)を
+        # 色ごとの物理特性(初速)を
         # 開幕時に適用する。sizeはボス以外にのみ適用する(ボスは上のboss_size_multで
         # 既に「ふたまわり大きい」を実現済みのため、二重に拡大しない)。
         traits = COLOR_TRAIT_MODIFIERS.get(entity.color_index, {})
@@ -1483,7 +1483,7 @@ def spawn_circles(
 
         circles.append(entity)
 
-    # 2026-09-16、冒頭フック強化(ユーザー指示): 全員の位置が出揃った後、各プレイヤーへ
+    # 2026-09-16、冒頭フック強化: 全員の位置が出揃った後、各プレイヤーへ
     # 「最も近い他プレイヤー」方向への追加インパルスを与える。両者が同時に相手へ向かうため
     # 実際の最初の衝突はOPENING_COLLISION_TARGET_SECONDSより早く起こる。1人だけの場合は対象なし。
     positions = [(e.body.position.x, e.body.position.y) for e in circles]
@@ -1544,7 +1544,7 @@ def _find_teleport_spot(
     arena_shape: str = "square",
     terrain: str | None = None,
 ) -> tuple | None:
-    """2026-09-09、ユーザー指摘対応: 以前は矩形範囲でしかサンプリングしておらず、
+    """以前は矩形範囲でしかサンプリングしておらず、
     donutの中心障害物に重なる/hourglassの非矩形な境界の外側(到達不可能な場所)に
     テレポートし、そのまま「枠の外に出て脱落する」もったいない結果になることがあった。
     _in_arena_bounds/_overlaps_terrain_obstaclesで実際に到達可能な位置だけに絞り込む。"""
@@ -1588,7 +1588,7 @@ def _distance_to_nearest_wall(x: float, y: float, arena_shape: str, half_x: floa
 def _weapon_blade_position(c: "CircleEntity", kind: str, frame_idx: int) -> tuple[float, float]:
     """weapon_colosseum専用: 剣/ハンマー(常時回転)・斧(回転中)の「武器が実際に描画されている
     位置」を物理空間で計算する(_draw_held_weaponの周回計算と同じ式)。
-    2026-09-21、ユーザー指摘対応: 「当たり判定がプレイヤー本体についているのでは」という
+    「当たり判定がプレイヤー本体についているのでは」という
     指摘の通り、これらの武器の当たり判定はプレイヤー中心からの距離で行っていたため、
     見た目上は武器が反対側にある時でも近くにいるだけで命中してしまっていた。武器の実位置を
     起点に判定し直すことで、見た目と当たり判定を一致させる。"""
@@ -1629,10 +1629,10 @@ def _random_food_position(
 
 def _two_tier_weapon_position(rng: random.Random, half_x: float, half_y: float) -> tuple[float, float]:
     """two_tier専用: 銃を山型足場の斜面上、低い端(枝分かれの先)寄りに配置する
-    (2026-09-20、ユーザー指示「枝分かれの先で武器を取れるように」。三角形化に伴い、
+    (「枝分かれの先で武器を取れるように」。三角形化に伴い、
     x座標だけでなくy座標も斜面(頂点→低い端の線形補間)に沿わせる。
     ※weapon_colosseum(新ルール、未実装)導入時は「隙間(GAP_FRAC分の空間)からも武器を
-    入手できる・全プレイヤーが武器を持てる」仕様が別途必要になる(ユーザー指示、2026-09-20)。
+    入手できる・全プレイヤーが武器を持てる」仕様が別途必要になる。
     現状はgun_duel専用(銃1丁の奪い合い)のためこの関数はそのままで良いが、weapon_colosseum
     実装時はルール分岐で複数武器スポーン版を追加すること。"""
     cx, edge_y, hl, peak_y = rng.choice(_two_tier_platforms(half_x, half_y))
@@ -1690,7 +1690,7 @@ def _poison_wire_position(
     """「有利になりそうな位置」の簡易ヒューリスティック: 出口があればその近く、
     密閉ステージなら中心付近に置く。
 
-    2026-09-09、ユーザー指摘対応: donutのように中心が障害物で埋まっているterrainだと、
+    donutのように中心が障害物で埋まっているterrainだと、
     中心付近に置いたワイヤーがそのまま到達不可能で「発動の意味がない」結果になっていた。
     中心が塞がっている場合は、実際に到達可能な位置をランダムに探す。ワイヤーは中心から
     左右に±WIRE_HALF_LENほど伸びるため、中心点だけでなく想定される全長ぶんの余白を見て
@@ -1761,9 +1761,9 @@ def simulate(
     ability_params: {ability名: {パラメータ名: 値}}で各特殊能力の効き目を上書きする
     (「新しい能力」ではなく既存能力の強さ違いバリアントを安全に作るための差し込み口)。
     wind_force: 全プレイヤーに毎フレーム一定に加わる水平方向中心の外力(重力とは別軸)。
-    3章「物理パラメータ」の「風等の外力」に対応(2026-09-09実装)。
+    風等の外力を加えられるようにする拡張として実装した(2026-09-09)。
     arena_size: "compact"(既定)|"spacious"|"tall"。ARENA_SIZE_VARIANTS参照。ステージのバリエーションを
-    増やす/画面をもっと使いたいというユーザー要望への対応(2026-09-08)。等方(縦横比1:1)かつ
+    増やし、画面をもっと使えるようにする狙いで追加した(2026-09-08)。等方(縦横比1:1)かつ
     compactの半径以下でのみ回転が安全なため、それ以外(非等方のtall、またはcompactより大きい
     等方サイズ)では下で自動的に回転を止める。
     """
@@ -1771,7 +1771,7 @@ def simulate(
         accel_zone = rule == "goal_reach"
 
     if rule == "weapon_colosseum":
-        # 2026-09-20、ユーザー指示: 「脱落のほとんどが落下による場外なので、Weapon Colosseumの
+        # 「脱落のほとんどが落下による場外なので、Weapon Colosseumの
         # 場合は穴の空いてないステージでやってください」。呼び出し元が何を渡しても関係なく、
         # このルールでは常に密閉する(gun_duelの「場外に出ない枠の中で戦う」と同じ思想)。
         hole_width = 0.0
@@ -1811,7 +1811,7 @@ def simulate(
         # 全高近くまで散らして初期の接触機会を減らす
         spawn_y_range = (layout["top"] + CIRCLE_RADIUS + 20, layout["bottom"] - CIRCLE_RADIUS - 20)
     elif terrain == "pinball":
-        # 2026-09-13、指示書対応: 開始直後に必ずポップバンパー群へ突入する「強制ファースト・
+        # 2026-09-13、設計仕様書対応: 開始直後に必ずポップバンパー群へ突入する「強制ファースト・
         # インパクト」を作るため、スポーンを最も上にあるバンパー(上段の小型バンパー、
         # PINBALL_UPPER_BUMPER_Y_RATIO)よりさらに上のステージ最上段だけに限定する。
         bumper_top_world_y = ARENA_CY + half_y * PINBALL_UPPER_BUMPER_Y_RATIO
@@ -1866,7 +1866,7 @@ def simulate(
         attacker_id: int, target: CircleEntity, dmg: int, at_frame: int, kind: str, target_hitstop: bool = True
     ) -> None:
         """weapon_colosseum専用: 武器のダメージを与え、HPが0以下になったら脱落させる。
-        2026-09-21、ユーザー指示による「ヒットストップ」の最終実装: 単に速度を1回ゼロに
+        による「ヒットストップ」の最終実装: 単に速度を1回ゼロに
         するだけだと、命中のたびに運動量を完全に失い(以後は重力/衝突で速度を一から
         作り直すしかない)、命中回数の多い試合ほど終盤に動きが鈍くなる問題があった。
         命中直前の速度を保存しておき、HITSTOP_FRAMESの間だけゼロで静止させた後、保存して
@@ -1874,7 +1874,7 @@ def simulate(
         静止しつつ運動量は失われないようにする(_trigger_hitstop/メインループの復元処理参照)。
         target_hitstop=False(ハンマー/斧などノックバックを伴う武器)の場合は、呼び出し側が
         既にtargetの速度をノックバック方向へ設定済みのため、ここでは上書きしない
-        (「ノックバックが無い限り速度を0にする」というユーザー指示に対応)。"""
+        (「ノックバックが無い限り速度を0にする」という設計にした)。"""
         target.hp -= dmg
         tx, ty = target.body.position
         result.ability_events.append(
@@ -1906,7 +1906,7 @@ def simulate(
     )
 
     # goal_reach専用: ゴールをバリアで囲み、何度か体当たりして破壊してからでないと到達できない
-    # ようにする(2026-09-08、ユーザー要望)。ゴールが上端の壁に近い(コンパクトなステージだと
+    # ようにする(2026-09-08)。ゴールが上端の壁に近い(コンパクトなステージだと
     # GOAL_RADIUS*1.6の全周は上の壁に食い込む)ため、半径は縮めずに上端の壁より上に出る
     # セグメントだけを間引く(D字型のリングになる)。プレイヤーは常に下/横から接近するため、
     # 上側が開いていても実質的な抜け道にはならない。
@@ -1962,7 +1962,7 @@ def simulate(
     active_weapons: dict = {k: None for k in WEAPON_KINDS}  # weapon_colosseum専用: 種類ごとに1つまで同時出現
     weapon_respawn_at_frame: dict = {k: int(WEAPON_INITIAL_DELAY_SECONDS * FPS) for k in WEAPON_KINDS}
     weapon_ever_spawned: set = set()  # weapon_colosseum専用: 種類ごとに一度出現したら二度と出現させない
-    # 2026-09-21、ユーザー指示: 近接武器(剣/槍/ハンマー)のクールタイムは「武器そのもの」では
+    # 近接武器(剣/槍/ハンマー)のクールタイムは「武器そのもの」では
     # なく「武器と当てた相手の組み合わせ」ごとに管理する(同時に複数の相手を攻撃できるように
     # するため)。キーは(攻撃側id, 対象id)。
     melee_pair_cooldown: dict[tuple[int, int], int] = {}
@@ -1982,7 +1982,7 @@ def simulate(
             ea = body_to_entity.get(id(a.body))
             eb = body_to_entity.get(id(b.body))
             if ea and eb and ea.alive and eb.alive and ea.id not in queued_loser_ids and eb.id not in queued_loser_ids:
-                # 2026-09-09、ユーザー指摘対応: 「どちらが吸収するのか説明なしでわかる」ように、
+                # 「どちらが吸収するのか説明なしでわかる」ように、
                 # ランダムに出現する食べ物(food_items)に触れて一定時間だけ得られる「吸収可能」
                 # 状態(empowered_until_frame)を吸収の必須条件にした。どちらも吸収可能でない
                 # 組み合わせはただ跳ね返るだけ(合体しない、通常の衝突として扱う)。
@@ -2001,7 +2001,7 @@ def simulate(
                     else:
                         attacker, defender = (ea, eb) if ea_can_eat else (eb, ea)
 
-                    # 2026-09-08、ユーザー指摘対応(早期決着が多いための難易度調整):
+                    # (早期決着が多いための難易度調整):
                     # 自分より大きい相手は吸収しきれない。その場合は全滅させず、自分を一段階
                     # 大きく・相手を一段階小さくする「かじり取り」に留める(pending_partial_trades)。
                     if attacker.radius >= defender.radius:
@@ -2017,7 +2017,7 @@ def simulate(
             # 位置でability_events経由の汎用リングフラッシュ+専用ポップ音(ABILITY_EFFECT_COLOR/
             # _synth_for_ability参照)を鳴らす。反発自体はpin_shape.elasticity(>1.0)に任せており、
             # ここでは速度を書き換えない(ライブ感の演出はpinballのような能動キックではなく、
-            # 指示書通りピン自体の反発係数の高さで表現する。安全弁は速度クランプ側で担保する)。
+            # 設計仕様書通りピン自体の反発係数の高さで表現する。安全弁は速度クランプ側で担保する)。
             player_shape, pin_shape = (a, b) if a.collision_type == 2 else (b, a)
             entity = body_to_entity.get(id(player_shape.body))
             pin_center = pin_shape.body.local_to_world(pin_shape.offset)
@@ -2032,12 +2032,12 @@ def simulate(
             )
 
         if terrain == "pinball" and {a.collision_type, b.collision_type} == {2, 8}:
-            # 2026-09-13、「本格ピンボール型ステージ」指示書対応: 弾き飛ばし自体はバンパーの
+            # 2026-09-13、「本格ピンボール型ステージ」設計仕様書対応: 弾き飛ばし自体はバンパーの
             # elasticity(PINBALL_BUMPER_RESTITUTION、build_space参照)に任せ、ここでは速度を
             # 書き換えない。ability_events経由で汎用の_draw_ability_effectsがヒット位置に
             # リング状のフラッシュ+専用ポップ音(ABILITY_EFFECT_COLOR/_synth_for_ability
             # 参照)を鳴らし、加えてbumper_x/bumper_yでどのバンパーが光ったかを_draw_terrainに
-            # 伝え、指示書指定の「一瞬1.2倍に拡縮」を該当バンパーだけに適用する。
+            # 伝え、設計仕様書指定の「一瞬1.2倍に拡縮」を該当バンパーだけに適用する。
             player_shape, bumper_shape = (a, b) if a.collision_type == 2 else (b, a)
             body = player_shape.body
             bumper_center = bumper_shape.body.local_to_world(bumper_shape.offset)
@@ -2055,7 +2055,7 @@ def simulate(
             )
 
         if barrier_state["active"] and {a.collision_type, b.collision_type} == {2, 7}:
-            # 2026-09-08、ユーザー要望: ゴールをバリアで囲み、既定回数ぶつかるまで到達できない
+            # ゴールをバリアで囲み、既定回数ぶつかるまで到達できない
             # ようにする。space変更(除去)はここではできないため、破壊判定だけ立てて
             # 実際の除去はstep完了後(下のbarrier_state["break_pending"]処理)で行う。
             cur_frame = frame_box["idx"]
@@ -2099,7 +2099,7 @@ def simulate(
                     c.body.velocity = c.body.velocity * (PIN_WALL_MAX_SPEED / speed)
 
         if terrain == "pinball":
-            # 2026-09-13、ユーザー指摘対応: バンパーを増やすのではなく、上部バンパー帯
+            # バンパーを増やすのではなく、上部バンパー帯
             # (PINBALL_FLOAT_ZONE_TOP_Y_RATIO〜BOTTOM_Y_RATIO)にいる間だけ重力の一部を
             # 打ち消し、自然落下より滞空時間を延ばすことで接触機会を増やす。space.gravityは
             # space全体に一様にかかるため、このフレームで既に加算された分の一部
@@ -2124,9 +2124,9 @@ def simulate(
                 if speed > PINBALL_MAX_SPEED:
                     c.body.velocity = c.body.velocity * (PINBALL_MAX_SPEED / speed)
 
-            # 指示書④「自動パルスフリッパー」対応(2026-09-13): 穴の手前の帯状ゾーンに
+            # 設計仕様書④「自動パルスフリッパー」対応(2026-09-13): 穴の手前の帯状ゾーンに
             # いる全プレイヤーへ、FLIPPER_PULSE_INTERVAL_SECONDSごとに一斉に上向きのキックを
-            # 与える(実際のフリッパー形状は実装せず、指示書の代替案「周期的なキック力」を採用。
+            # 与える(実際のフリッパー形状は実装せず、設計仕様書の代替案「周期的なキック力」を採用。
             # 理由はFLIPPER_ZONE_HALF_WIDTH等の定義部のコメント参照)。
             if frame_idx >= flipper_next_pulse_frame:
                 zone_top = layout["bottom"] - FLIPPER_ZONE_HEIGHT
@@ -2221,8 +2221,7 @@ def simulate(
                 elif terrain == "split_horizontal":
                     gx, gy = _split_horizontal_weapon_position(gun_rng, half_x, half_y, circles)
                 elif frame_idx == 0:
-                    # 2026-09-21、ユーザー指示「スワイプ離脱(広告誤認・無風)防止」対応:
-                    # 開幕直後の初回スポーンだけ中央寄り(半径40%圏内)に絞り、全プレイヤーの
+                    # # 開幕直後の初回スポーンだけ中央寄り(半径40%圏内)に絞り、全プレイヤーの
                     # 中央方向への強い初期インパルスと噛み合わせて早期の争奪戦を作る。
                     # 銃を失った後の再出現(2回目以降)は従来通り全域ランダムのままにし、
                     # 中盤以降の展開の多様性は変えない。
@@ -2256,7 +2255,7 @@ def simulate(
                         active_gun["end_frame"] = frame_idx
                         active_gun["picked_by"] = c.id
                         active_gun = None
-                        # 2026-09-20、ユーザー指示: split_horizontalは通常より銃のスポーン頻度を上げる。
+                        # split_horizontalは通常より銃のスポーン頻度を上げる。
                         respawn_delay = (
                             SPLIT_HORIZONTAL_GUN_RESPAWN_DELAY_SECONDS
                             if terrain == "split_horizontal"
@@ -2364,13 +2363,13 @@ def simulate(
                         still_flying.append(b)
                 active_bullets = still_flying
 
-        # weapon_colosseum専用: 5種の武器(剣/槍/ハンマー/弓矢/斧、筆は2026-09-20にユーザー指示で
+        # weapon_colosseum専用: 5種の武器(剣/槍/ハンマー/弓矢/斧、筆は2026-09-20に
         # 廃止)の出現・拾得・各武器固有の攻撃処理・矢の飛行判定をまとめて行う。他ルールは
         # 「1回の接触/場外で即脱落」だが、このルールはHP(10)が0になるまで生存する。脱落自体は_apply_weapon_damage/
         # _weapon_eliminate(gun_duelの弾ヒット処理と同じ場所・同じパターン)で直接行い、
         # 後段の汎用eliminated判定(area_control/goal_reach/場外用)には一切触れない。
         if rule == "weapon_colosseum":
-            # 武器の出現・拾得。2026-09-20、ユーザー指示: 「1ゲーム内での武器の再出現はなし
+            # 武器の出現・拾得。「1ゲーム内での武器の再出現はなし
             # (無駄に散らかる)。一度所持した武器はずっと持つ」に対応し、各種類1回だけ出現させ、
             # 拾われても再出現させない(weapon_ever_spawnedで一度きりに制御)。拾った武器を
             # 手放す処理もどこにも実装していないため、保持したプレイヤーは脱落するまでずっと
@@ -2381,8 +2380,7 @@ def simulate(
                     and active_weapons[kind] is None
                     and frame_idx >= weapon_respawn_at_frame[kind]
                 ):
-                    # 2026-09-21、ユーザー指示「スワイプ離脱(広告誤認・無風)防止」対応:
-                    # weapon_colosseumの武器は一度きりの出現(再出現なし)のため、常に
+                    # # weapon_colosseumの武器は一度きりの出現(再出現なし)のため、常に
                     # 「開幕直後の初回スポーン」に相当する。中央寄り(半径40%圏内)に絞り、
                     # 全プレイヤーの中央方向への強い初期インパルスと噛み合わせて早期の
                     # 武器の奪い合いを作る。
@@ -2438,7 +2436,7 @@ def simulate(
                     nearest_dist = ((nox - cx) ** 2 + (noy - cy) ** 2) ** 0.5
 
                 if c.weapon == "sword":
-                    # 2026-09-21、ユーザー指摘対応: 当たり判定はプレイヤー中心でなく、実際に
+                    # 当たり判定はプレイヤー中心でなく、実際に
                     # 描画されている(周回中の)剣の位置を起点に行う(_weapon_blade_position参照)。
                     # クールタイムは武器自体でなく(攻撃側,対象)の組み合わせごとに管理し、
                     # range内の相手全員を毎フレーム判定するため、複数の相手を同時期に
@@ -2468,7 +2466,7 @@ def simulate(
                             melee_pair_cooldown[key] = frame_idx + int(SPEAR_COOLDOWN_SECONDS * FPS)
 
                 elif c.weapon == "hammer":
-                    # 2026-09-21、ユーザー指摘対応: 剣と同様、当たり判定・ノックバック方向とも
+                    # 剣と同様、当たり判定・ノックバック方向とも
                     # プレイヤー中心でなく実際に描画されている槌の位置を起点にする。
                     wx, wy = _weapon_blade_position(c, "hammer", frame_idx)
                     for o in others:
@@ -2509,7 +2507,7 @@ def simulate(
                         }
                         result.arrows.append(arrow_record)
                         active_arrows.append(arrow_record)
-                        # 反動: 発射方向と逆向きにshooterを押す(指示書「反動」対応)
+                        # 反動: 発射方向と逆向きにshooterを押す(設計仕様書「反動」対応)
                         c.body.velocity = (
                             c.body.velocity[0] - math.cos(angle) * BOW_RECOIL,
                             c.body.velocity[1] - math.sin(angle) * BOW_RECOIL,
@@ -2517,7 +2515,7 @@ def simulate(
                         c.weapon_cooldown_until_frame = frame_idx + int(BOW_COOLDOWN_SECONDS * FPS)
 
                 elif c.weapon == "axe":
-                    # 2026-09-21、ユーザー指示で全面刷新(3回目、最終版): 「基本は止めて、
+                    # 全面刷新(3回目、最終版): 「基本は止めて、
                     # 定期的に当たり判定・ぶっ飛ばし判定つきの高速回転をする」。静止中は
                     # 何もしない(描画側で他の近接武器と同じ汎用の構えを表示する)。一定間隔
                     # (クールダウン)で高速回転(axe_spin_until_frame)を開始し、回転中は
@@ -2528,7 +2526,7 @@ def simulate(
                         c.axe_spin_until_frame = frame_idx + int(AXE_SPIN_DURATION_SECONDS * FPS)
                         c.weapon_cooldown_until_frame = frame_idx + int(AXE_COOLDOWN_SECONDS * FPS)
                     if frame_idx < c.axe_spin_until_frame:
-                        # 2026-09-21、ユーザー指摘対応: 剣/ハンマーと同様、当たり判定・
+                        # 剣/ハンマーと同様、当たり判定・
                         # ノックバック方向ともプレイヤー中心でなく実際に回転している斧の位置を起点にする。
                         wx, wy = _weapon_blade_position(c, "axe", frame_idx)
                         for o in others:
@@ -2549,7 +2547,7 @@ def simulate(
 
             # 矢(弓矢)の飛行判定。gun_duelの弾と同じく物理演算(pymunk)には乗せず毎フレーム
             # 位置を直接積分するが、矢は専用の追加重力(ARROW_GRAVITY)を受けて弾道が落ちる点が
-            # 弾と異なる(指示書「重力の影響を受ける」対応)。
+            # 弾と異なる(設計仕様書「重力の影響を受ける」対応)。
             if active_arrows:
                 still_flying_arrows = []
                 for a in active_arrows:
@@ -2638,9 +2636,9 @@ def simulate(
         # area_control専用: 保護ゾーン。安全地帯の内側に数秒ごとに小さなゾーンが出現する。
         # 固定座標のまま存在し、プレイヤーが入ると実体化(物理的な囲いが生成され)、
         # プレイヤーはその固定座標の中で数秒間跳ね返り続ける(閉じ込められる)。囲いの中にいる間は
-        # 安全地帯の外に出ていても脱落しない(2026-09-09、ユーザー要望「shrinking safe zoneだけでは
-        # 張り合いがない」への対応。2026-09-09に「無敵で自由に動ける」から「物理的に閉じ込める」に
-        # ユーザー訂正あり)。
+        # 安全地帯の外に出ていても脱落しない(「shrinking safe zoneだけでは
+        # 張り合いがない」への対応。「無敵で自由に動ける」仕様から「物理的に閉じ込める」
+        # 仕様に修正した)。
         if rule == "area_control":
             if active_protection_zone is None and frame_idx >= protection_zone_respawn_at_frame:
                 current_zone_r = _zone_radius(frame_idx / FPS, layout["zone_start_radius"])
@@ -2649,7 +2647,7 @@ def simulate(
                 # 保護ゾーンが出現してしまうバグがあった(2026-09-09、レンダリング確認で発見)。
                 # さらに、min(half_x, half_y)の円形範囲でしか判定していなかったため、hourglassの
                 # ような非矩形の境界や、donut/cross/pegboardの内部障害物を一切考慮できておらず、
-                # 依然として到達不可能な場所に出現することがあった(2026-09-09、ユーザー再指摘で
+                # 依然として到達不可能な場所に出現することがあった(2026-09-09に発覚し
                 # 修正)。_in_arena_bounds/_overlaps_terrain_obstacles(teleportと同じ判定)で
                 # 実際に到達可能な位置だけに絞り込む。実体化後の囲い(cage、ピックアップ判定より
                 # 大きい)が外壁やterrain障害物からはみ出さないよう、余白計算にはcageの半径を使う。
@@ -2690,7 +2688,7 @@ def simulate(
             if active_protection_zone is not None:
                 pzx, pzy = active_protection_zone["x"], active_protection_zone["y"]
                 pzr = active_protection_zone["radius"]
-                # 2026-09-09、ユーザー指摘対応: 誰にも捕獲されないままPROTECTION_ZONE_LIFESPAN_SECONDS
+                # 誰にも捕獲されないままPROTECTION_ZONE_LIFESPAN_SECONDS
                 # 経過したら消滅させ、通常の間隔を置いて次のゾーンが出現できるようにする
                 # (以前は無期限に居座り、次のゾーンが二度と出現しないことがあった)。
                 if frame_idx - active_protection_zone["start_frame"] >= int(PROTECTION_ZONE_LIFESPAN_SECONDS * FPS):
@@ -2737,7 +2735,7 @@ def simulate(
                         still_active.append(cage)
                 active_cages = still_active
 
-        # 2026-09-21、ユーザー指示「カラーパレットの記号化」対応: 緑(color_index=2)は
+        # 緑(color_index=2)は
         # 特殊能力とは別に、常に最も近い相手(チーム戦なら味方以外)から逃げる方向へ
         # 継続的な小さな加速度を受ける(クールダウン制の特殊能力と違い毎フレーム効く)。
         for c in circles:
@@ -2783,7 +2781,7 @@ def simulate(
                 # を超えるまで確定しないため、既に壁の穴を抜けて枠の外に出ている(だが脱落判定は
                 # まだ)プレイヤーが一瞬だけ「最も近い相手」として選ばれてしまうことがあった。
                 # そちらへ突進すると自分も同じ穴を追いかけて自滅するため、alive判定に加えて
-                # 枠の内側にまだいることも条件にする(ユーザー指摘対応)。
+                # 枠の内側にまだいることも条件にする。
                 others = [
                     o
                     for o in circles
@@ -2839,7 +2837,7 @@ def simulate(
 
             elif c.ability == "vortex":
                 # 2026-09-09: 旧freeze(周囲を強制減速)から変更。「相手を遅くする」演出は
-                # 終盤の見栄えを悪くするというユーザー指摘のため、shockwaveの逆(周囲を
+                # 終盤の見栄えを悪くするという問題があったため、shockwaveの逆(周囲を
                 # 自分の方へ引き寄せる)にした。減速させないため衝突・接近が増え、むしろ
                 # 見応えが上がる方向の効果になる。
                 radius = _ability_param(ability_params, "vortex", "radius", VORTEX_RADIUS)
@@ -2920,7 +2918,7 @@ def simulate(
                 local_x < -escape_half_x - ESCAPE_MARGIN or local_x > escape_half_x + ESCAPE_MARGIN
                 or local_y < -escape_half_y - ESCAPE_MARGIN or local_y > escape_half_y + ESCAPE_MARGIN
             )
-            # 2026-09-20、ユーザー指摘対応: 「そのルール独自の脱落原因でなく、穴/端から
+            # 「そのルール独自の脱落原因でなく、穴/端から
             # 場外に落ちた脱落の方が多い試合は選ばないように」フィルター(scoring側)のため、
             # 脱落原因をcauseとして記録する。escaped_bounds(枠の外に完全に出た=穴や端からの
             # 場外)を最優先の原因とし、area_control/trapは「まだ枠内だが独自条件に該当」した
@@ -2939,7 +2937,7 @@ def simulate(
             elif rule == "goal_reach":
                 gx, gy = layout["goal_point"]
                 dist_to_goal = ((x - gx) ** 2 + (y - gy) ** 2) ** 0.5
-                # 2026-09-08、ユーザー要望のバリア追加に伴い、バリアが壊れるまでは到達判定自体を
+                # のバリア追加に伴い、バリアが壊れるまでは到達判定自体を
                 # 無効にする(物理的にも壁で塞がれているはずだが、念のため二重に防ぐ)。
                 if dist_to_goal <= GOAL_RADIUS and not barrier_state["active"]:
                     winner_this_frame = c
@@ -3098,7 +3096,7 @@ def _draw_arena(
     width = max(1, int(WALL_VISUAL_THICKNESS * scale))
 
     if shape == "square":
-        # 2026-09-08、ユーザー指摘対応: 各壁セグメントを個別のdraw.line()で描画すると、直角に
+        # 各壁セグメントを個別のdraw.line()で描画すると、直角に
         # 交わる外側の角に線幅ぶんの小さなくぼみ(継ぎ目)ができる。角に正方形パッチを重ねる
         # 対策を試したが、今度は角の先端がわずかに尖って飛び出す(はみ出し)副作用が出た。
         # 根本対応として、壁全体(穴の両端を起点・終点とする一筆書き)を1回のdraw.line()呼び出しで
@@ -3127,7 +3125,7 @@ def _draw_arena(
 
 
 def _draw_hourglass_arena(draw: ImageDraw.ImageDraw, angle: float, half_x: float, half_y: float, scale: float = 1.0) -> None:
-    """砂時計そのものが外枠になる場合の描画(2026-09-09、ユーザー要望で通常の四角い外枠を廃止)。
+    """砂時計そのものが外枠になる場合の描画(通常の四角い外枠を廃止)。
     _draw_arenaのsquare分岐と同じく、始点に戻る1本の連続した折れ線をjoint="curve"で描画し、
     辺の継ぎ目のくぼみ・はみ出しを防ぐ(_hourglass_boundary_chainは物理演算側とも共有)。"""
     width = max(1, int(WALL_VISUAL_THICKNESS * scale))
@@ -3168,7 +3166,7 @@ def _draw_arena_walls(
         _draw_arena(draw, angle, shape, hole_width, half_x, half_y, scale)
 
 
-TERRAIN_COLOR = (220, 220, 220)  # 2026-09-13、ユーザー指摘で外枠の壁と同じ白に統一(旧: 灰色)
+TERRAIN_COLOR = (220, 220, 220)  # 外枠の壁と同じ白に統一(旧: 灰色)
 
 
 def _draw_terrain(
@@ -3182,12 +3180,12 @@ def _draw_terrain(
 ) -> None:
     """内部地形障害物の描画。壁と同じ_rotate_point変換を使うことで、回転ギミックが
     作動していても壁と完全に同期して回転する(物理演算側もarena_bodyに追加しているため一致する)。
-    2026-09-09、ユーザー指摘対応: 各chainを1本の連続したdraw.line()(joint="curve")で描画する。
+    各chainを1本の連続したdraw.line()(joint="curve")で描画する。
     セグメントごとに個別のdraw.line()を呼んでいた旧実装は、外壁の角と同じ「継ぎ目のくぼみ・
     はみ出し」バグを内部地形でも再発させていた(_draw_arenaで既に解決済みのパターンを流用)。
 
     flash_local_positions(2026-09-13追加): pinball専用。直近でヒットしたバンパーのローカル
-    座標(round(cx,1), round(cy,1))の集合。該当バンパーだけ指示書指定の一瞬の拡縮(1.2倍)を
+    座標(round(cx,1), round(cy,1))の集合。該当バンパーだけ設計仕様書指定の一瞬の拡縮(1.2倍)を
     適用する(_iter_rendered_framesがresult.ability_eventsのbumper_x/bumper_yから構築する)。"""
     chains, circles = _terrain_obstacles(terrain, half_x, half_y)
     width = max(1, int(WALL_VISUAL_THICKNESS * scale))
@@ -3241,7 +3239,7 @@ def _distance_field(w: int, h: int, cx: float, cy: float) -> np.ndarray:
     return dist
 
 
-# 2026-09-20、ユーザー指示(area_controlの緊張感強化): 安全地帯の外側(危険地帯)にも
+# (area_controlの緊張感強化): 安全地帯の外側(危険地帯)にも
 # 薄いオーラを描き、「境界の外側は危ない」ことを視覚的に強調する。時間経過とともに
 # 色が濃くなり、決着(ZONE_SHRINK_SECONDS経過)が近づくほど危険度が高まって見える。
 AREA_CONTROL_AURA_COLOR = np.array([230, 40, 30], dtype=np.float32)
@@ -3267,12 +3265,12 @@ def _apply_area_control_danger_aura(img: Image.Image, t: float, layout: dict, sc
     return Image.fromarray(np.clip(arr, 0, 255).astype(np.uint8))
 
 
-# 2026-09-20、ユーザー指示: トップライト(ゴッドレイ/環境光)。単一の光源(画面上部やや
+# トップライト(ゴッドレイ/環境光)。単一の光源(画面上部やや
 # 左寄りの1点)から差し込む薄い光条+全体のゆるい陰影グラデーションを常時重ね、
 # フラットな背景に奥行きを出す。判定には一切影響しない純粋な演出。
 #
-# 2026-09-20(続き、ユーザー指示による修正): 「光源は一箇所のみ・枠やプレイヤーにも
-# 影を・光量を減らす」との指摘を受け、(1)3本ビーム→単一光源+単一光条に変更、
+# 「光源は一箇所のみ・枠やプレイヤーにも影を・光量を減らす」という方針に修正し、
+# (1)3本ビーム→単一光源+単一光条に変更、
 # (2)光源と反対側が暗くなる全体グラデーション(=枠面の陰影)を追加、
 # (3)各プレイヤーに光源と反対方向への柔らかい影を追加、(4)光量(alpha)を0.11→0.05へ
 # 大幅に下げた。w,hが不変な1本のレンダリング中はマスク/グラデーションを使い回す。
@@ -3376,7 +3374,7 @@ _DUST_SEED_CACHE: dict[tuple, list] = {}
 
 
 def _dust_particle_seeds(w: int, h: int) -> list[tuple[float, float, float, float]]:
-    """godrayの光の筋の中を漂う塵パーティクル(指示書「オプション: 塵パーティクル」への対応、
+    """godrayの光の筋の中を漂う塵パーティクル(設計仕様書「オプション: 塵パーティクル」への対応、
     2026-09-20実装)の初期位置・個体差をキャッシュする。戻り値は(x0, y0, 位相, 速度倍率)。
     位置は画面全体からランダムに撒いておき、可視性をray_maskの値でゲートする
     (ビームの外では自然にほぼ見えなくなるため、ビーム形状を別途再計算する必要がない)。"""
@@ -3443,7 +3441,7 @@ def _apply_lighting(img: Image.Image, frame_idx: int, frame_state: list, scale: 
 
 
 def _draw_accel_zone(draw: ImageDraw.ImageDraw, frame_idx: int, accel_zone_rect: tuple, scale: float = 1.0) -> None:
-    """加速ゾーンの視覚表現。2026-09-09、ユーザー指摘(上向き矢印だけではダサい)により、
+    """加速ゾーンの視覚表現。(上向き矢印だけではダサい)により、
     下から上へ連続して上昇し続ける横波線のアニメーションに変更した。純粋な演出であり、
     当たり判定や実際の力の計算(ACCEL_ZONE_FORCE)には一切影響しない。"""
     x0, y0, x1, y1 = accel_zone_rect
@@ -3477,8 +3475,8 @@ def _draw_accel_zone(draw: ImageDraw.ImageDraw, frame_idx: int, accel_zone_rect:
 
 def _draw_flipper_zone(draw: ImageDraw.ImageDraw, layout: dict, scale: float = 1.0) -> None:
     """2026-09-13、pinball専用: 自動パルスフリッパーが作動する帯の位置を示す演出
-    (当たり判定・キック自体には影響しない)。ユーザー指摘で、4辺を破線で囲む旧デザインは
-    「点線で情報量が多くスマートでない」との指摘を受けたため、上端1本の実線だけに簡略化した
+    (当たり判定・キック自体には影響しない)。4辺を破線で囲む旧デザインは点線で情報量が
+    多くスマートでないと判断し、上端1本の実線だけに簡略化した
     (下端は壁/穴と重なるため元々冗長、左右の縦線も他の要素と交錯して見づらかった)。"""
     x0, y0 = _zoom_point((ARENA_CX - FLIPPER_ZONE_HALF_WIDTH, layout["bottom"] - FLIPPER_ZONE_HEIGHT), scale)
     x1, _ = _zoom_point((ARENA_CX + FLIPPER_ZONE_HALF_WIDTH, layout["bottom"]), scale)
@@ -3495,7 +3493,7 @@ def _draw_trap(draw: ImageDraw.ImageDraw, trap_center: tuple, scale: float = 1.0
 
 
 def _draw_wires(draw: ImageDraw.ImageDraw, wires: list, scale: float = 1.0) -> None:
-    """poison_wire(紫)が設置する障害物の描画。2026-09-08、ユーザー指摘対応: 以前は縁が紫でも
+    """poison_wire(紫)が設置する障害物の描画。以前は縁が紫でも
     内側の芯が緑寄りの色(60,220,140)で、青っぽく見えて誰のスキルか分かりにくかった。
     芯も同系統の(明るい)紫にして、紫プレイヤーのスキルだと一目で分かるようにした。"""
     for a, b in wires:
@@ -3554,8 +3552,8 @@ def _draw_protection_zone(draw: ImageDraw.ImageDraw, x: float, y: float, radius:
 def _draw_protection_cage(draw: ImageDraw.ImageDraw, shape: str, x: float, y: float, radius: float, scale: float = 1.0) -> None:
     """area_control専用: 保護ゾーンが実体化した後の物理的な囲い。固定座標(空間に固定、
     回転しない)に、外枠と同じshapeの塗りつぶし半透明+実線の囲いを描く(_cage_local_segments
-    と同じ形状)。プレイヤーはこの中で跳ね返り続ける(2026-09-09、ユーザー訂正: 無敵で自由に
-    動けるのではなく、物理的に閉じ込められる仕様)。"""
+    と同じ形状)。プレイヤーはこの中で跳ね返り続ける(無敵で自由に動けるのではなく、
+    物理的に閉じ込められる仕様に修正した)。"""
     zx, zy = _zoom_point((x, y), scale)
     r = radius * scale
     if shape == "square":
@@ -3589,7 +3587,7 @@ def _draw_goal_barrier(
         draw.line([(zx, zy), (ex, ey)], fill=color, width=max(1, int(2 * scale)))
 
 
-# 2026-09-20、ユーザー指示: 「銃だとわかるように」見た目を改善。以前は横棒+縦棒だけの
+# 「銃だとわかるように」見た目を改善。以前は横棒+縦棒だけの
 # T字型で銃だと分かりにくかったため、スライド(銃身)・トリガーガード・グリップを
 # 持つ側面シルエットの1本のポリゴンに描き直した(単位長さ1=銃身の半分の長さ、
 # +x方向=銃口側)。Tabler Icons(既存の6ch目で使用中、materials/icons/tabler/)に
@@ -3692,7 +3690,7 @@ def _draw_shield_aura(draw: ImageDraw.ImageDraw, x: float, y: float, radius: flo
 
 
 # ============================================================
-# weapon_colosseum専用の描画群(2026-09-20、ユーザー指摘で色分けバッジ+文字から刷新)。
+# weapon_colosseum専用の描画群(色分けバッジ+文字から刷新)。
 # gun_duelの銃(GUN_SHAPE_POINTS)と同じ手法(ローカル座標のポリゴンを回転・拡大縮小して
 # ワールド座標へ変換)で、各武器が「それだとわかる」シルエットになるよう専用形状を
 # 用意する。+x方向を武器の先端(刃/打撃部)側とする共通ルール。
@@ -3727,7 +3725,7 @@ def _draw_sword_shape(draw: ImageDraw.ImageDraw, cx: float, cy: float, angle: fl
 
 
 def _draw_spear_shape(draw: ImageDraw.ImageDraw, cx: float, cy: float, angle: float, size: float) -> None:
-    """2026-09-20、ユーザー指摘対応: 旧版は柄が細すぎて(幅0.035)実機では穂先しか見えていな
+    """旧版は柄が細すぎて(幅0.035)実機では穂先しか見えていな
     かった。柄を太く・長くし、はっきり「槍を持っている」とわかるようにした。"""
     to_world = _weapon_transform(cx, cy, angle, size)
     shaft = [to_world(x, y) for x, y in [(0.60, 0.075), (-1.35, 0.075), (-1.35, -0.075), (0.60, -0.075)]]
@@ -3737,7 +3735,7 @@ def _draw_spear_shape(draw: ImageDraw.ImageDraw, cx: float, cy: float, angle: fl
 
 
 def _draw_hammer_shape(draw: ImageDraw.ImageDraw, cx: float, cy: float, angle: float, size: float) -> None:
-    """2026-09-21、ユーザー指示: 先端部の幅を広くし、T字型のシルエットにする。"""
+    """先端部の幅を広くし、T字型のシルエットにする。"""
     to_world = _weapon_transform(cx, cy, angle, size)
     shaft = [to_world(x, y) for x, y in [(0.45, 0.05), (-0.95, 0.05), (-0.95, -0.05), (0.45, -0.05)]]
     draw.polygon(shaft, fill=WEAPON_WOOD_COLOR, outline=(255, 255, 255))
@@ -3747,7 +3745,7 @@ def _draw_hammer_shape(draw: ImageDraw.ImageDraw, cx: float, cy: float, angle: f
 
 def _draw_bow_shape(draw: ImageDraw.ImageDraw, cx: float, cy: float, angle: float, size: float) -> None:
     """弓は塗りつぶしポリゴンではなく弧(折れ線近似)+弦の直線で表現する。
-    2026-09-21、ユーザー指摘対応: 旧版は弧の膨らみ(振幅0.15)が浅すぎて弓に見えにくかった
+    旧版は弧の膨らみ(振幅0.15)が浅すぎて弓に見えにくかった
     ため、放物線状の式(x=0.35*(1-y^2))に変更しはっきりした「(」字カーブにした。"""
     to_world = _weapon_transform(cx, cy, angle, size)
     ys = [-1.0 + 2.0 * i / 12 for i in range(13)]
@@ -3757,7 +3755,7 @@ def _draw_bow_shape(draw: ImageDraw.ImageDraw, cx: float, cy: float, angle: floa
 
 
 def _draw_axe_shape(draw: ImageDraw.ImageDraw, cx: float, cy: float, angle: float, size: float) -> None:
-    """2026-09-21、ユーザー指示: 両刃(斧頭の上下に対称な刃)にする。"""
+    """両刃(斧頭の上下に対称な刃)にする。"""
     to_world = _weapon_transform(cx, cy, angle, size)
     shaft = [to_world(x, y) for x, y in [(0.20, 0.05), (-0.85, 0.05), (-0.85, -0.05), (0.20, -0.05)]]
     draw.polygon(shaft, fill=WEAPON_WOOD_COLOR, outline=(255, 255, 255))
@@ -3788,12 +3786,12 @@ def _draw_weapon_pickup(draw: ImageDraw.ImageDraw, kind: str, x: float, y: float
 
 
 WEAPON_HELD_SIZE_MULT = {
-    "spear": 2.0,  # 2026-09-20、ユーザー指摘: 「槍を持てるよう伸ばしてください」への対応
-    "axe": 1.7,  # 2026-09-21、ユーザー指示: 「斧そのもののサイズは大きくしてください」への対応
+    "spear": 2.0,  # 「槍を持てるよう伸ばしてください」への対応
+    "axe": 1.7,  # 「斧そのもののサイズは大きくしてください」への対応
 }
 SPEAR_FACING_MIN_SPEED = 20.0 * _ARENA_SCALE  # この速さ未満はほぼ静止とみなし、狙っている方向のままにする
 
-# 2026-09-20、ユーザー指示: ハンマーも剣と同様にプレイヤーの周りを周回させ(「回転させて
+# ハンマーも剣と同様にプレイヤーの周りを周回させ(「回転させて
 # 持つ」)、剣より大きめの周回半径で「より前に出す」(見た目の存在感を強くする)。
 WEAPON_SPIN_KINDS = {"sword", "hammer"}
 WEAPON_SPIN_ORBIT_MULT = {"sword": 1.5, "hammer": 2.3}
@@ -3814,11 +3812,11 @@ def _draw_held_weapon(
     axe_spinning: bool = False,
 ) -> None:
     """weapon_colosseum専用: 保持中の武器。プレイヤーの脇に表示する。
-    2026-09-20、ユーザー指摘: 槍だけは狙っている相手の方向(angle)ではなく、
+    槍だけは狙っている相手の方向(angle)ではなく、
     自身が進んでいる方向(vx,vy)へ向ける(移動がほぼ止まっている場合はangleにフォールバック)。
-    剣・ハンマーは指示書/ユーザー指示「回転しながら攻撃」に対応し、プレイヤーの周りを周回する
+    剣・ハンマーは設計方針「回転しながら攻撃」に対応し、プレイヤーの周りを周回する
     (ハンマーは剣より大きな周回半径で、より前に出て見えるようにする)。
-    2026-09-21、ユーザー指示で斧を全面刷新(3回目、最終版): 基本は静止(他の非スピン武器と
+    斧を全面刷新(3回目、最終版): 基本は静止(他の非スピン武器と
     同じ、狙っている相手側へ少し前に出た構え)、攻撃中(axe_spinning)だけ剣/ハンマーより
     さらに速い高速回転にする。"""
     zx, zy = _zoom_point((x, y), scale)
@@ -3860,7 +3858,7 @@ def _draw_arrow(draw: ImageDraw.ImageDraw, x: float, y: float, vx: float, vy: fl
 
 
 def _draw_hp_bar(draw: ImageDraw.ImageDraw, x: float, y: float, radius: float, hp: int, max_hp: int, scale: float = 1.0) -> None:
-    """weapon_colosseum専用: プレイヤー頭上のHP表示(指示書「体力の表記」への対応)。
+    """weapon_colosseum専用: プレイヤー頭上のHP表示(設計仕様書「体力の表記」への対応)。
     バーの色は残量に応じて緑→黄→赤に変化させ、直感的に状況を伝える。"""
     zx, zy = _zoom_point((x, y), scale)
     bar_w = radius * 2.0 * scale
@@ -3915,7 +3913,7 @@ def _draw_hud(img: Image.Image, rule: str, remaining_count: int | None) -> None:
     """画面上部に、半透明バーでルールの英語キャプションと残数を表示する。
     完全不透明にすると上部にいるプレイヤーが隠れてしまうため半透明にしている。
     """
-    # 2026-09-08、ユーザー指摘によりフォントサイズを拡大(34→46, 24→32)。読みやすさ優先だが
+    # フォントサイズを拡大(34→46, 24→32)。読みやすさ優先だが
     # 画面の邪魔にならないよう、バー自体の高さ(bar_h)と半透明度は維持したまま調整した。
     bar_h = 128
     overlay = Image.new("RGBA", (int(ARENA_W), bar_h), (10, 10, 14, 175))
@@ -3940,7 +3938,7 @@ def _draw_hud(img: Image.Image, rule: str, remaining_count: int | None) -> None:
 def _draw_crown(draw: ImageDraw.ImageDraw, x: float, y: float, radius: float, scale: float = 1.0) -> None:
     """現在の首位(スコア/サイズ)を示す、頭上に浮かぶフラットスタイルの王冠ポリゴン。
 
-    2026-09-20、ユーザー指示: 「誰が有利か」を常時示す視覚サインを置き、最後まで見届ける
+    「誰が有利か」を常時示す視覚サインを置き、最後まで見届ける
     動機付けにする。指標(キル数またはサイズ)が明確に定義できるルールにのみ適用する方針とし、
     現状は現在の半径=サイズがそのまま指標になる`absorb_growth`にのみ使う(呼び出し側で
     ルールを判定する)。hole_fall/goal_reach/area_control/gun_duelには「キル数」に相当する
@@ -4061,14 +4059,14 @@ def _draw_player_eyes(
     全プレイヤー共通のトリガーとして使う簡易実装(誰と誰がぶつかったかまでは反映されない)。
     小さすぎる図形(吸収されて縮んだ等)には描かない。
 
-    2026-09-20、ユーザー指摘対応: 目を一回り大きく、状況に応じた表情
+    目を一回り大きく、状況に応じた表情
     (expression: "dizzy"|"worried"|"happy"|"neutral")を追加した。まばたき中はどの表情でも
     一律で閉じ目にする(表情より優先)。
-    2026-09-20追記、ユーザー指摘対応: 「目が常にこちら(カメラ)を向いていて不気味」との
+    「目が常にこちら(カメラ)を向いていて不気味」との
     指摘を受け、目のペアを画面に対して固定配置するのをやめ、進んでいる方向(face_angle、
     球体が向きを変えたと見立てる)側へ寄せて配置するようにした(黒目の向きではなく
     「頭の向き」自体を変える設計)。
-    2026-09-21、ユーザー指摘で再修正: 目を並べる軸をface_angleに直交させて回転させると、
+    再修正: 目を並べる軸をface_angleに直交させて回転させると、
     移動方向によっては両目が縦に並んでしまい不自然だった。「両目の位置関係はずっと横に
     ある(頭頂部に対して同じ向き)」という指示に沿い、目を並べる軸は常に画面の水平方向で
     固定し、ペアの中心位置だけがface_angle方向(進行方向)へ寄る設計に変更した。"""
@@ -4130,7 +4128,7 @@ def _build_shake_by_frame(collisions: list, elimination_order: list | None = Non
     """8-3: 衝突の衝撃(impulse)に応じたスクリーンシェイクの強度(0-1)をフレームごとに算出する。
     同一フレームに複数の衝突が重なった場合は最大値を採用する。
 
-    2026-09-20、ユーザー指示(撃破インパクト音とスクリーンシェイクの完全同期): 脱落
+    (撃破インパクト音とスクリーンシェイクの完全同期): 脱落
     (`elimination_order`)は穴落下・ゾーン外判定等、物理衝突(impulse)を伴わないケースも
     多く、従来は脱落の瞬間に必ずしもシェイクが起きていなかった。脱落フレームには原因を
     問わず常に最大強度(1.0)のシェイクを追加保証する(衝突由来のシェイクとは`max()`で合成)。
@@ -4152,14 +4150,14 @@ def _build_shake_by_frame(collisions: list, elimination_order: list | None = Non
     return shake_by_frame
 
 
-# 2026-09-20、冒頭演出強化(ユーザー指示): 開始時にカメラを軽くズームした状態から通常表示
+# 2026-09-20、冒頭演出強化: 開始時にカメラを軽くズームした状態から通常表示
 # (1.0倍)へ引くことで、開幕の「引き込み」を強める。常時追従の`camera="tracking"`とは異なり、
 # 開始直後だけの一回限りの決定論的な変形なので、2026-09-08に廃止したtrackingカメラの
 # 不具合(枠回転との整合等)は再発しない(単純な中央クロップ+リサイズのみ)。
 #
 # 2026-09-20〜21、二転三転した経緯: 当初1.4→1.8倍+放射ブラーまで強化したが「ゲーム画面だと
-# 認識される前に離脱している」との指摘を受け1.18倍+弱いブラーへマイルド化。2026-09-21、
-# ユーザー指示「スワイプ離脱(広告誤認・無風)防止」で最終的にブラーそのものを撤廃し、
+# 認識される前に離脱している」という問題があり1.18倍+弱いブラーへマイルド化。
+# 最終的にはスワイプ離脱(広告誤認・無風)対策としてブラーそのものを撤廃し、
 # 「1.2倍→1.0倍への単純なズームのみ」に統一した(視認性最優先。フラッシュ/暗転等の
 # マスキング演出も一切使わない方針)。
 OPENING_ZOOM_SECONDS = 0.5
@@ -4167,8 +4165,7 @@ OPENING_ZOOM_START = 1.2
 
 # シームレスループ(エピローグ末尾→次ループ冒頭の繋ぎ)。開幕ズームと真逆の動き(1.0倍→
 # OPENING_ZOOM_START倍へのズームインのみ)をかけ、動画の最終フレームの状態を冒頭の
-# frame_idx=0の状態(zoom=OPENING_ZOOM_START)に一致させる。2026-09-21、ユーザー指示で
-# ブラー・継ぎ目フラッシュ(光過敏性配慮のため元々alphaを抑えていたもの)を撤廃したため、
+# frame_idx=0の状態(zoom=OPENING_ZOOM_START)に一致させる。# ブラー・継ぎ目フラッシュ(光過敏性配慮のため元々alphaを抑えていたもの)を撤廃したため、
 # キャラクターの座標リセットを隠す役割はエピローグの「初期位置へ滑らかに戻る」既存の
 # 移動(travel_progress、2026-09-12の元々の設計)のみに委ねる形に戻った。
 LOOP_TRANSITION_SECONDS = 0.5
@@ -4217,7 +4214,7 @@ def _apply_loop_reverse_zoom(img: Image.Image, phase_t: float) -> Image.Image:
     return _crop_zoom(img, zoom)
 
 
-# 2026-09-20、ユーザー指示(area_controlの緊張感強化): 安全地帯が縮むにつれ、カメラも
+# (area_controlの緊張感強化): 安全地帯が縮むにつれ、カメラも
 # 少しずつ中央へ寄せる。決着(ZONE_SHRINK_SECONDS経過)に近づくほど寄り方が加速する
 # イージングにし、「じわじわ追い詰められる」感覚を強める。開幕ズーム(0.8秒だけ)とは
 # 独立した、試合時間全体に渡るゆっくりとした変形。
@@ -4328,7 +4325,7 @@ def _draw_target_reticle(draw: ImageDraw.ImageDraw, zx: float, zy: float, color:
     """dash発動時、突進先のターゲットに表示する照準マーク(カメラのオートフォーカス風の四隅ブラケット)。
     「何かが自分を狙っている」ことが説明なしで伝わるよう、リング状の汎用エフェクトとは別の形状にしている。
 
-    2026-09-08、ユーザー指摘対応: gap/lengthが固定ピクセル値(15)だったため、CIRCLE_RADIUSが
+    gap/lengthが固定ピクセル値(15)だったため、CIRCLE_RADIUSが
     35→25に縮小された後はブラケットの大部分がプレイヤー本体の陰に隠れ、ほぼ見えなくなっていた。
     target_radiusを基準にgapを決めることで、プレイヤーのサイズ(growth_surge等での変化も含む)に
     関わらず、常に本体の外側にはっきり見えるようにする。
@@ -4432,7 +4429,7 @@ def _draw_nibble_shrink_mark(draw: ImageDraw.ImageDraw, zx: float, zy: float, co
 def _draw_ability_effects(draw: ImageDraw.ImageDraw, effects: list, frame_state: list, scale: float = 1.0) -> None:
     """特殊能力発動時のエフェクト。何が起きているか説明なしで伝わるよう、能力ごとに異なる
     固有の形状を使う(色は全てABILITY_EFFECT_COLORのその能力の色に統一する。2026-09-09、
-    ユーザー要望により全8種を専用形状にした):
+    全8種を専用形状にした):
     - dash: ターゲットへ追従する照準マーク
     - slam: 急降下を示す二重矢印
     - growth_surge: 外向きの拡張矢印(4隅)
@@ -4489,7 +4486,7 @@ def _draw_ability_effects(draw: ImageDraw.ImageDraw, effects: list, frame_state:
         if kind == "shockwave":
             r = SHOCKWAVE_RADIUS * (age / ABILITY_EFFECT_FRAMES) * scale
         elif kind == "vortex":
-            # 2026-09-08、ユーザー指摘対応: 内向き矢印(growth_surgeの外向き矢印の逆)だと
+            # 内向き矢印(growth_surgeの外向き矢印の逆)だと
             # 「縮小(小さくなる)」と誤読されやすい。shockwave(赤・外に広がるリング)の
             # ちょうど逆として、リングが自分に向かって縮んでいく(=引き寄せている)演出にする。
             r = VORTEX_RADIUS * (1 - age / ABILITY_EFFECT_FRAMES) * scale
@@ -4633,7 +4630,7 @@ def _iter_rendered_frames(
 
     barrier_hit_frames = sorted(ev["frame"] for ev in result.ability_events if ev["type"] == "barrier_hit")
 
-    # 2026-09-13、指示書対応: pinballのポップバンパー、ヒットした瞬間から数フレームだけ
+    # 2026-09-13、設計仕様書対応: pinballのポップバンパー、ヒットした瞬間から数フレームだけ
     # 該当バンパーを拡縮表示する(_draw_terrainのflash_local_positions)。on_beginがログした
     # bumper_x/bumper_y(ローカル座標、_pinball_bumper_positionsと同じ基準)で該当バンパーを
     # 特定する。
@@ -4881,7 +4878,7 @@ def _iter_rendered_frames(
             else:
                 travel_progress = _ease_out((phase_t - EPILOGUE_HOLD_END) / (1 - EPILOGUE_HOLD_END))
 
-            # 2026-09-13、ユーザー指摘対応: 決着時に勝者へカメラを寄せる(ズームイン)演出は廃止。
+            # 決着時に勝者へカメラを寄せる(ズームイン)演出は廃止。
             # カメラは常に全体を映したまま固定し、代わりに勝者の色をWINテキストに反映することで
             # 誰が勝者かを伝える(下記のtext_color参照)。
             crop_w, crop_h = ARENA_W, ARENA_H
@@ -4896,7 +4893,7 @@ def _iter_rendered_frames(
             base = Image.new("RGB", (int(ARENA_W), int(ARENA_H)), (24, 24, 28))
             draw = ImageDraw.Draw(base)
             _draw_arena_walls(draw, current_arena_angle, result.shape, result.hole_width, result.terrain, layout["half_x"], layout["half_y"], scale)
-            # 2026-09-13、ユーザー指摘で修正: 本編側では毎フレーム_draw_terrainを呼んでいたが、
+            # 修正: 本編側では毎フレーム_draw_terrainを呼んでいたが、
             # エピローグ側はこの呼び出しが漏れており、donut/pegboard/pinball等の内部地形の
             # オブジェクトがエピローグ突入と同時に消えて見えるバグがあった。
             _draw_terrain(draw, result.terrain, current_arena_angle, layout["half_x"], layout["half_y"], scale)
@@ -4931,7 +4928,7 @@ def _iter_rendered_frames(
                     _draw_player_eyes(draw, x, y, draw_radius, scale, entity_id, len(result.frames) + i, False)
                 epilogue_frame_state.append({"x": x, "y": y, "radius": draw_radius})
 
-            # 2026-09-20、ユーザー指摘対応: 照明(単一光源+陰影+落ち影)がエピローグ側では
+            # 照明(単一光源+陰影+落ち影)がエピローグ側では
             # 一切適用されておらず、決着した瞬間にライトが消えて見えるバグがあった
             # (本編側の_apply_lighting呼び出しがこのエピローグ専用の描画パスに漏れていた)。
             # 常時点灯にするため、本編と同じ_apply_lightingをここでも適用する。
@@ -4945,7 +4942,7 @@ def _iter_rendered_frames(
             # 読みにくくなるのを防ぐため、テキスト描画より前に適用する。
             cropped = _apply_loop_reverse_zoom(cropped, phase_t)
 
-            # 2026-09-21、ユーザー指示「WIN表示のディレイとフェード」対応: 決着後すぐに表示して
+            # 決着後すぐに表示して
             # 終盤までずっと保持する旧仕様(2026-09-13実装)は、「WINが表示され続けている=
             # もうすぐ動画が終わる」という合図になりスワイプを誘発しているとの判断で撤回。
             # EPILOGUE_TEXT_DELAY(0.5秒)まで一切表示せず、その後ほぼ瞬間的に出現して
@@ -4966,7 +4963,7 @@ def _iter_rendered_frames(
                 draw2 = ImageDraw.Draw(cropped)
                 text, font = _epilogue_win_label(result)
                 bg = (24, 24, 28)
-                # 2026-09-13、ユーザー指摘対応: カメラ寄せ演出を廃止した代わりに、WINの文字色を
+                # カメラ寄せ演出を廃止した代わりに、WINの文字色を
                 # 勝者のプレイヤーカラーにして誰が勝ったかを示す。文字色が暗い色(紺・紫等)だと
                 # 黒い影では暗いアリーナ背景に沈んで読みにくくなるため、影の色は文字色の輝度に
                 # 応じて黒(明るい文字色向け)/白に近い色(暗い文字色向け)を自動選択し、
@@ -4990,7 +4987,7 @@ _EPILOGUE_LABEL_FONT_CACHE: dict[int, object] = {}
 
 
 def _win_font():
-    # 2026-09-08、ユーザー指摘により拡大(90→160)。決着の瞬間の主役表示なので、
+    # 拡大(90→160)。決着の瞬間の主役表示なので、
     # HUDキャプションよりも大きく目立たせる。
     global _WIN_FONT_CACHE
     if _WIN_FONT_CACHE is None:
@@ -5008,7 +5005,7 @@ def _epilogue_label_font(size: int):
 
 
 def _epilogue_win_label(result: "SimResult") -> tuple[str, object]:
-    """2026-09-21、ユーザー指示「TEAM WINS/BOSS WINS等の明示ラベルを追加」対応。
+    """「TEAM WINS/BOSS WINS等の明示ラベルを追加」対応。
     match_typeに応じて表示文言とフォントサイズを変える(「WIN」は3文字前提のfont(160pt)
     のまま、長い文言は800px幅の枠に収まるようフォントを縮小する。実測: 160ptだと
     "TEAM WINS"/"BOSS WINS"は916px、"PLAYERS WIN"は1113pxとARENA_W(800)を超えて
@@ -5035,7 +5032,7 @@ def _synth_eliminate(volume: float = 0.35) -> np.ndarray:
     """脱落の瞬間用の効果音(衝突ポップ・勝利ジングルと区別するため)。
     8-4対応で2026-09-09にdecayを上げ(9→13)、durationを短縮(0.22→0.17)し歯切れをよくした。
 
-    2026-09-20、ユーザー指示(撃破インパクトの強化): 従来の下降ピッチ単体に加えて、
+    (撃破インパクトの強化): 従来の下降ピッチ単体に加えて、
     (1)高域のクリスタルブレイク音(複数の高周波を重ねて減衰させる)と、
     (2)低域のサブベースキック(短時間で立ち上がり減衰する低音の一撃)をレイヤーし、
     より「重み」のある撃破音にした。既存の下降ピッチ(中域)は「らしさ」を保つためそのまま残す。
@@ -5118,7 +5115,7 @@ def _synth_bullet_blocked(volume: float = 0.3) -> np.ndarray:
     return _synth_sweep(1000, 600, 0.1, volume, decay=9.0)
 
 
-# 2026-09-20、ユーザー指示: 武器が命中した瞬間、武器種ごとに異なる音を鳴らす。
+# 武器が命中した瞬間、武器種ごとに異なる音を鳴らす。
 _WEAPON_HIT_SOUND_CACHE: dict[str, np.ndarray] = {}
 
 
@@ -5147,7 +5144,7 @@ def _synth_weapon_hit(kind: str) -> np.ndarray:
 
 
 def _synth_opening_impact(volume: float = 0.55) -> np.ndarray:
-    """2026-09-16、冒頭フック強化(ユーザー指示8-6): 動画0.00秒ぴったりに鳴らす、
+    """2026-09-16、冒頭フック強化: 動画0.00秒ぴったりに鳴らす、
     重低音インパクト(ドゥン)+高めの倍音(ゴング風)の複合音。無音スタートによる
     フィード離脱を防ぐ目的。"""
     thud = _synth_sweep(95, 45, 0.35, volume, decay=7.0)
@@ -5176,8 +5173,8 @@ def _synth_for_ability(kind: str) -> np.ndarray:
         return _synth_wire_place()
     if kind == "teleport":
         return _synth_teleport()
-    # 2026-09-13、指示書対応: pin_wallのピン衝突用に、短く歯切れの良い高音ポップ音を
-    # 明示的に割り当てる(指示書が挙げていた"_synth_pin_hit"相当。8-4「音響設計の精度」向けに
+    # 2026-09-13、設計仕様書対応: pin_wallのピン衝突用に、短く歯切れの良い高音ポップ音を
+    # 明示的に割り当てる(設計仕様書が挙げていた"_synth_pin_hit"相当。8-4「音響設計の精度」向けに
     # 既にチューニング済みの_synth_popをそのまま再利用し、重複実装を避けた)。
     # あわせて、pinball(能動キック式バンパー)がABILITY_SOUND_PARAMS未登録のまま
     # 無音になっていた(2026-09-13以前からの見落とし)のもここで修正する。
@@ -5242,7 +5239,7 @@ def render_audio(result: SimResult, total_frames: int) -> np.ndarray:
     n_samples = int(total_frames / FPS * SAMPLE_RATE) + SAMPLE_RATE
     buffer = np.zeros(n_samples, dtype=np.float32)
 
-    # 2026-09-16、冒頭フック強化(ユーザー指示8-6): 0.00秒ぴったりに重低音インパクト音を配置。
+    # 2026-09-16、冒頭フック強化: 0.00秒ぴったりに重低音インパクト音を配置。
     opening_impact = _synth_opening_impact()
     buffer[: len(opening_impact)] += opening_impact
 
@@ -5274,7 +5271,7 @@ def render_audio(result: SimResult, total_frames: int) -> np.ndarray:
         if end > start:
             buffer[start:end] += sound[: end - start]
 
-    # 2026-09-20、ユーザー指示: weapon_colosseumの武器命中音(武器種ごとに音色を変える)。
+    # weapon_colosseumの武器命中音(武器種ごとに音色を変える)。
     for ev in result.ability_events:
         if ev["type"] != "weapon_hit":
             continue
@@ -5290,11 +5287,11 @@ def render_audio(result: SimResult, total_frames: int) -> np.ndarray:
         end = min(start + len(jingle), len(buffer))
         buffer[start:end] += jingle[: end - start]
 
-    # 2026-09-13、ユーザー指摘により削除: エピローグで各プレイヤーが初期位置へ戻り始める瞬間
+    # 削除: エピローグで各プレイヤーが初期位置へ戻り始める瞬間
     # (移動フェーズ開始、旧来「ズームアウト」と呼んでいたタイミング)の効果音は今後付けない。
     # 決着直後のズームイン相当は既存の勝利ジングルが担う。
 
-    # 2026-09-08、ユーザー要望: goal_reachのバリア(体当たりで破壊)の効果音。
+    # goal_reachのバリア(体当たりで破壊)の効果音。
     barrier_hit_sound = _synth_barrier_hit()
     barrier_break_sound = _synth_barrier_break()
     for ev in result.ability_events:
@@ -5367,7 +5364,7 @@ def _build_frame_plan(total_frames: int, window: tuple[int, int] | None) -> list
     整数のリストなので、画像そのものを複製するのと違いメモリはごくわずかしか使わない。
 
     2026-09-20〜21、ヒットストップをこの仕組み(フレーム保持)で実装したことがあったが、
-    ユーザー指示により「ノックバックが無い限り速度をゼロにするだけで十分」という、より単純な
+    「ノックバックが無い限り速度をゼロにするだけで十分」という、より単純な
     物理側の実装(_apply_weapon_damage参照)に置き換えたため、この関数は元の形に戻した。
     """
     if window is None:
@@ -5431,7 +5428,7 @@ def render(
     ランナーでOOM Killされることを実測で確認したため、moviepyのVideoClip(make_frame=...)で
     1フレームずつ描画とエンコードを進めるストリーミング方式に変更した。
     (2026-09-09追記: 一時導入していたリプレイ挿入は、わかりにくい・自滅脱落まで再度見せてしまう
-    という理由でユーザー判断により削除した)
+    という理由で削除した)
     """
     main_frame_count = len(result.frames)  # エピローグを除いた本編フレーム数
     epilogue_count = _epilogue_frame_count(result)

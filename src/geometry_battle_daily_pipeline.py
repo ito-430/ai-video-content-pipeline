@@ -12,7 +12,7 @@ geometry_battle_characters.py(キャラクター性)を、実際の投稿へつ�
 3. 選ばれた候補だけを本番レンダリング(render、音声付き)する
 4. キャラクター戦績を更新し、YouTubeへアップロードし、動画ログに記録する
 
-ユーザー合意（2026-09-09）: 公開設定はpublicで開始。投稿ごとのDiscord通知は行わない
+公開設定はpublicで開始する。投稿ごとのDiscord通知は行わない
 （週次KPT報告のみ担当。geometry_battle_kpt.py参照）。失敗時は共通の#アラートへ通知する。
 """
 
@@ -43,42 +43,39 @@ CANDIDATE_COUNT = 30
 # (穴の空いたステージは使わない設計のため、terrain組み合わせの検証は不要)。
 RULES = ["hole_fall", "goal_reach", "area_control", "absorb_growth", "gun_duel", "weapon_colosseum"]
 
-# 2026-09-21、ユーザー指示「エンティティ数の制限」対応: 情報過多によるスワイプ離脱を防ぐため、
-# 全ルールで参加人数の上限を4〜5体に固定する(従来は4〜7体、hourglassのみ4〜6体)。
+# 情報過多によるスワイプ離脱を防ぐため、全ルールで参加人数の上限を4〜5体に固定する
+# (従来は4〜7体、hourglassのみ4〜6体)。
 N_CIRCLES_MAX = 5
-# 2026-09-21、ユーザー指示「データ駆動型パイプライン移行」対応(一括リセットバッチ、以降は
-# 1変更ずつ検証する方針)。実績(視聴回数加重平均維持率)でhole_fallが最高・gun_duelが最低と
-# 判明したため、前回(2026-09-21昼、コミット8d84d79)のgun_duel優遇(3.0)は実際のデータと
-# 逆方向だったと判断し撤回する。goal_reachの抑制(0.3)も当時は「初動の分かりにくさ」という
-# 推測ベースの調整だったため、今回のデータ駆動リセットで一旦均等(1.0)に戻す。
+# ルールごとの選定重み。推測ベースの調整ではなく、実績(視聴回数加重平均維持率)に基づいて
+# 1ルールずつ検証しながら更新する方針にした。実績でhole_fallが最高・gun_duelが最低と
+# 判明したため、以前入れていたgun_duel優遇(3.0)は実際のデータと逆方向だったため撤回し、
+# goal_reachの抑制(0.3)も推測ベースの調整だったためデータ駆動で均等(1.0)に戻した。
 # RULESに載っていないルールは重み1.0(均等)として扱う(_random_candidate_params参照)。
 RULE_WEIGHTS = {
     "hole_fall": 5.0,  # 実績最高のため最大化
     "gun_duel": 0.1,  # 実績最低のため、原因検証用の単一テスト枠程度まで大幅に絞る(0にはしない)
 }
 
-# 2026-09-21、ユーザー指示「対戦形式(match_type)の新軸」対応。既存のrule(勝敗条件)とは
-# 独立した軸で、選ばれたruleがそれぞれの対戦形式に対応している場合のみ抽選対象にする
-# (absorb_growthは接触・吸収成長がゲーム性の中心でチーム制と相性が悪いため両方とも対象外、
-# ユーザー確定済み)。
+# 対戦形式(match_type)は既存のrule(勝敗条件)とは独立した軸で、選ばれたruleが
+# それぞれの対戦形式に対応している場合のみ抽選対象にする(absorb_growthは接触・
+# 吸収成長がゲーム性の中心でチーム制と相性が悪いため両方とも対象外にしている)。
 TEAM_COMPATIBLE_RULES = {"hole_fall", "goal_reach", "area_control", "gun_duel", "weapon_colosseum"}
 BOSS_COMPATIBLE_RULES = {"weapon_colosseum", "gun_duel"}
 TEAM_MATCH_PROBABILITY = 0.2  # ruleがteam対応の場合、この確率でmatch_type="team"にする
-# 2026-09-21、ユーザー指示「データ駆動型パイプライン移行」対応: 視覚的フックが最も強い
-# ボス戦の抽選確率を15%→45%に大幅引き上げ(指示の40〜50%の中央値)。
+# 視覚的フックが最も強いボス戦の抽選確率を15%→45%に大幅引き上げた。
 BOSS_MATCH_PROBABILITY = 0.45  # ruleがboss対応の場合、この確率でmatch_type="boss"にする(teamと排他)
-TEAM_COUNTS = [2, 3]  # 「2〜3チームに分かれて」の指示通り
+TEAM_COUNTS = [2, 3]  # チーム戦は2〜3チームに分かれる構成のみ対応
 # ボスの「2種類のスキル」は既存8種の特殊能力(色↔能力の対応表と同じ実体)から2つを組み合わせる
 BOSS_ABILITY_POOL = list(ABILITY_BY_COLOR_INDEX.values())
 # チーム戦は最低でも1チームあたり2人以上になるようteam_count*2を、ボス戦はボス以外に最低3人
-# 対戦相手がいるよう調整する。2026-09-21、n_circles上限を5に引き下げた(下記N_CIRCLES_MAX)ため、
-# team_count=3の下限も6→5に合わせて引き下げた(2+2+1構成を許容する)。
+# 対戦相手がいるよう調整する。n_circles上限を5に引き下げた(下記N_CIRCLES_MAX)のに合わせ、
+# team_count=3の下限も6→5に引き下げている(2+2+1構成を許容する)。
 TEAM_MIN_N_CIRCLES = {2: 4, 3: 5}
 BOSS_MIN_N_CIRCLES = 4  # ボス1体+最低3人
 
 SHAPES = ["square", "circle"]
 PLAYER_SHAPES = ["circle", "square", "triangle"]
-# 2026-09-08、ユーザー要望「四角形プレイヤー軸も同じ程度の確率で採用されるように」への対応。
+# 四角形プレイヤーも他の形状と同程度の確率で採用されるようにする対応。
 # squareは「重力の影響を受けず常に直進、壁や相手には反射する」専用挙動
 # (geometry_battle_gen._no_gravity_velocity_func)を導入したところ、goal_reach(重力に逆らわず
 # 一直線でゴールに着くため速すぎて尺フィルターに落ちる)とhole_fall(重力がないため穴へ落ちず
@@ -160,7 +157,7 @@ def _adaptive_player_shape_weights(rule: str) -> dict[str, float]:
         adjusted[s] = base_weights[s] * mult
     return adjusted
 PALETTES = ["vivid", "pastel", "neon", "sunset"]
-# 2026-09-09、ユーザー方針: 通常のカメラワークは全体追従(tracking)ではなく固定を基本とする
+# 通常のカメラワークは全体追従(tracking)ではなく固定を基本とする
 # (決着時に勝者へズームインする演出は既存のエピローグ側で別途常時行われる、カメラ軸とは独立)。
 # trackingの実装自体はgeometry_battle_gen.pyに残しているが、本番の候補生成では選ばない。
 CAMERAS = ["fixed"]
@@ -176,7 +173,7 @@ CAMERAS = ["fixed"]
 RULE_PARAM_OVERRIDES = {
     "absorb_growth": {"gravity": 56.6},  # 尺15〜25秒ターゲットには既にほぼ適正(実測、変更不要と確認済み)
     "area_control": {"elasticity": 1.0, "damping": 1.0, "hole_width": 0.0},
-    # gun_duelは「場外に出ない枠の中で戦う」仕様(2026-09-08、ユーザー要望)のため密閉必須。
+    # gun_duelは「場外に出ない枠の中で戦う」仕様のため密閉必須。
     # 2026-09-09、尺短縮に伴いgravityも底上げ(タイマー短縮と合わせて接触頻度を上げる狙い。
     # それでも未到達率が高いまま残る既知の課題、geometry_battle_gen.py側のコメント参照)
     "gun_duel": {"hole_width": 0.0, "gravity": DEFAULT_GRAVITY * 1.5},
@@ -192,11 +189,11 @@ SHAPE_PARAM_OVERRIDES = {"circle": {"hole_width": 80.0}}
 # 20シード中20件が未到達)。そのため無条件の総当たりにはせず、実測でundecided=0を確認できた
 # 組み合わせだけを許可リスト化する。terrain=None(地形なし)は全ルールで常に選択可能(既存動作)。
 TERRAIN_COMPATIBLE_RULES = {
-    # 2026-09-09(ユーザー指摘で外枠を強制的にcircleへ変更した際に再検証): 円形外枠にすると
+    # (外枠を強制的にcircleへ変更した際に再検証): 円形外枠にすると
     # gun_duelだけ20シード中16件が未到達になる新規の不具合が判明したため除外した
     # (旧square外枠+反発係数1.3の設定では動作していたが、その設定自体が別バグだったため
     # 参考にならない。円形外枠+反発係数1.0の正しい設定での実測に基づく)
-    # 2026-09-16、ユーザー指摘「goal_reachの決着のほとんどが場外」を受けて実測したところ、
+    # 「goal_reachの決着のほとんどが場外」という傾向を受けて実測したところ、
     # donut×goal_reachは中心の円形障害物がゴールへの直線的な経路を塞ぎ、プレイヤーが
     # ドーナツ状の狭い通路で衝突を繰り返して場外に弾かれる展開に偏っており、決着した
     # 候補の43%が場外(terrain=Noneなら20%)だった。除外する。
@@ -211,12 +208,12 @@ TERRAIN_COMPATIBLE_RULES = {
     # 決着の妨げにならず、20シード中0件未到達・尺17.7〜24.7秒(目標15-25秒にほぼ収まる)を
     # 実測で確認できたため採用した。
     "pinball": ["area_control"],
-    # 2026-09-20、ユーザー指示「新ステージ考案(戦闘系)」で追加した2種(gun_duel専用、
+    # 新ステージとして追加した2種(gun_duel専用、
     # geometry_battle_gen.py参照)。どちらも武器(銃)の受け渡しが決着の唯一の手段のため、
     # gravity/BULLET_SPEED/照準ロジック(_lead_aim_angle)を合わせて実測チューニングした上で
     # 採用。素のgun_duel(terrain=None)自体が15〜25%程度は未到達になる既知の傾向を持つため、
     # それと同等以下(実測ではやや上回る)undecided率に収まることを確認して採用ラインとした。
-    # 2026-09-20追記: 足場を長方形→山型(三角形)へ変更(ユーザー指示)。隙間の調整も伴い
+    # 足場を長方形→山型(三角形)へ変更。隙間の調整も伴い
     # 実測undecided=9/40・尺中央値30.9秒に変化(素のgun_duelよりやや高いが許容範囲として採用)。
     "two_tier": ["gun_duel"],
     "split_horizontal": ["gun_duel"],  # 実測(40シード): undecided=5/40、尺中央値13.9秒
@@ -237,7 +234,7 @@ TERRAIN_RULE_PARAM_OVERRIDES = {
     ("gun_duel", "split_horizontal"): {"gravity": DEFAULT_GRAVITY * 0.7, "arena_size": "tall"},
 }
 TERRAIN_SELECTION_PROBABILITY = 0.4  # 対応ルールの場合でも60%は従来通りterrainなしにする
-# 2026-09-16、ユーザー指摘: pinballは実装済みだが対応terrain5種の均等抽選に埋もれ、
+# pinballは実装済みだが対応terrain5種の均等抽選に埋もれ、
 # area_control×terrain選択が発動する場合の1/5(全体では約0.4%)でしか選ばれず、実測でも
 # 直近27投稿中0件だった。ビジュアル面で目立たせたい意図もあり、pinballだけ重みを上げる
 # (未指定のterrainは重み1のまま)。
@@ -247,10 +244,9 @@ TERRAIN_SELECTION_WEIGHTS = {"pinball": 4}
 # コード変更なしで対応できるように。daily-publish.ymlのPUBLISH_PRIVACY変数と同じ考え方）。
 PRIVACY_STATUS = os.environ.get("GEOMETRY_PUBLISH_PRIVACY", "public")
 
-# 2026-09-21、ユーザー指示「CTR改善: area_controlのメタデータ改修」対応: area_controlの
-# CTRが著しく低い(実測0.88%)ことが判明。CTRが良好なgoal_reach("{n} Shapes Race to the
-# Top!")と同じ「目的語+動詞」構文に寄せ、旧来の説明的な文言("The Safe Zone is
-# Shrinking...")から目的が瞬時にわかる文言へ変更する。単発の切り替えとして扱い(この
+# area_controlのCTRが著しく低い(実測0.88%)ことが判明。CTRが良好なgoal_reach("{n} Shapes
+# Race to the Top!")と同じ「目的語+動詞」構文に寄せ、旧来の説明的な文言("The Safe Zone
+# is Shrinking...")から目的が瞬時にわかる文言へ変更する。単発の切り替えとして扱い(この
 # チャンネルはA/Bテスト機能を持たないため、切り替え前後の期間比較で効果を見る)、
 # 他のルールのタイトルは今回変更しない。
 TITLE_TEMPLATES = {
@@ -295,7 +291,7 @@ CATEGORY_ID = "24"  # Entertainment
 # 変えずに見た目の大きさだけをずらす(大きく強そうに見えて実力は普通/小さく弱そうに見えて実力は普通)。
 # 視聴者の予測を裏切る決着はコメント・シェアの誘発につながるという想定(5章)。
 # 2026-09-09、尺15〜25秒への短縮に伴い、短い尺の中でも「えっ、そっちが勝つの?」という
-# カタルシスを増やす狙いで0.35→0.45に引き上げ(ユーザー指示)。
+# カタルシスを増やす狙いで0.35→0.45に引き上げた。
 VISUAL_MISMATCH_PROBABILITY = 0.45
 VISUAL_MISMATCH_SCALES = [1.5, 0.65]
 
@@ -325,7 +321,7 @@ def _random_candidate_params(rng: random.Random) -> dict:
     else:
         terrain = None
     if terrain == "donut":
-        # 2026-09-09、ユーザー指摘: ドーナツ型は外枠も円でないと成立しない
+        # ドーナツ型は外枠も円でないと成立しない
         # (中心の円形障害物+外枠が正方形だと「ドーナツ」に見えない)
         shape = "circle"
     if terrain == "pinball":
@@ -333,13 +329,12 @@ def _random_candidate_params(rng: random.Random) -> dict:
         # 計算している(円形外枠だと隅が丸まり、スリングショットの基点が実際の壁の外に
         # はみ出す)。実測もsquareでのみ行っているため、pinball選択時はshapeを固定する。
         shape = "square"
-    # 2026-09-09、ユーザー報告で発見: hourglassのネック(くびれ)付近で7体が密集して衝突すると、
+    # 2026-09-09に発覚: hourglassのネック(くびれ)付近で7体が密集して衝突すると、
     # まれに薄い壁を1フレームですり抜けて枠外に出てしまう(トンネリング)。ネックを広げる
     # (CHOKE_WIDTH_RATIO)対応と合わせ、密集の引き金になる最大人数も6に制限して完全に解消した
     # (実測: n_circles<=6+ネック拡大で60万フレーム超のチェックで0件)。
-    # 2026-09-21、ユーザー指示「情報過多によるスワイプ防止」対応: 参加人数を全ルール
-    # 最大4〜5体に固定するため、上記のhourglass専用上限(6)よりさらに絞ってN_CIRCLES_MAXを
-    # 一律の上限として適用する。
+    # 情報過多によるスワイプ離脱を防ぐため、参加人数を全ルール最大4〜5体に固定する。
+    # 上記のhourglass専用上限(6)よりさらに絞ってN_CIRCLES_MAXを一律の上限として適用する。
     n_circles_max = min(N_CIRCLES_MAX, 6 if terrain == "hourglass" else 7)
     # 2026-09-21、match_type新軸対応: チーム戦は1チーム最低2人・ボス戦はボス以外最低3人を
     # 確保できるようn_circlesの下限を引き上げる(通常の下限4はそのまま、必要な場合のみ増やす)。
@@ -360,8 +355,8 @@ def _random_candidate_params(rng: random.Random) -> dict:
         "boss_abilities": boss_abilities,
         "palette": rng.choice(PALETTES),
         "camera": rng.choice(CAMERAS),
-        # 2026-09-08、ユーザー要望: 決着の瞬間のスローモーションは「気持ちの良い決着」演出の
-        # 一部として毎回入れる(以前の50%抽選だと入らない回があり物足りない、との指摘)
+        # 決着の瞬間のスローモーションは「気持ちの良い決着」演出の一部として毎回入れる
+        # (以前の50%抽選だと入らない回があり、決着インパクトが弱くなっていた)
         "slow_motion": True,
         # 2026-09-09: terrain選択時はtrap(別の内部ハザード)との組み合わせを検証していないため、
         # 未検証の複合を避けて無効化する(terrainなしの場合は従来通り20%で有効)
@@ -406,18 +401,17 @@ def _rules_used_today() -> set[str]:
     return used
 
 
-# 2026-09-08、ユーザー指示: 5秒等の即決着版が公開されてしまう問題への対応。
+# 5秒等の即決着版が公開されてしまう問題への対応。
 # evaluate_candidate()が20〜40秒の尺フィルター(geometry_battle_scoring.PRODUCTION_DECISION_SECONDS_RANGE)
 # を無条件の足切りとして持つようになったため、1バッチで全滅した場合はすぐに妥協せず
 # 最大この回数まで再サンプリングする(軽量シミュレーションのみなのでコストは小さい)。
 MAX_CANDIDATE_BATCHES = 3
 
-# 2026-09-21、ユーザー指示「バンディット選定の統合」対応: 候補の一部を、Geminiが提案し
-# 実地シミュレーションで検証済みのコンボプール(geometry_battle_idea_generator.py)から
-# イプシロン-グリーディで選ぶ。残りは従来通りの完全ランダム生成のままにし、両者を
-# 同じ基準判定(evaluate_candidate)で公平に競わせて最高スコアのものを選ぶ設計にした
-# (=コンボだから優遇する、という特別扱いはしない)。プールが空の場合は自動的に
-# 従来の完全ランダム生成のみになる(select_bandit_combo参照)。
+# 候補の一部を、Geminiが提案し実地シミュレーションで検証済みのコンボプール
+# (geometry_battle_idea_generator.py)からイプシロン-グリーディで選ぶ。残りは従来通りの
+# 完全ランダム生成のままにし、両者を同じ基準判定(evaluate_candidate)で公平に競わせて
+# 最高スコアのものを選ぶ設計にした(=コンボだから優遇する、という特別扱いはしない)。
+# プールが空の場合は自動的に従来の完全ランダム生成のみになる(select_bandit_combo参照)。
 BANDIT_CANDIDATE_SHARE = 0.3  # 1バッチ(CANDIDATE_COUNT件)のうち、コンボプールから選ぶ割合
 
 
@@ -515,9 +509,9 @@ def main():
     rng = random.Random()
     params, result, circles, score = select_candidate(rng)
 
-    # 2026-09-21、ユーザー指示「バンディット選定の統合」対応: 実際に採用された候補が
-    # コンボプール由来だった場合のみ、そのコンボの実績(uses/total_score)に反映する
-    # (採用されなかった候補は「実際に使われた」わけではないため反映しない)。
+    # 実際に採用された候補がコンボプール由来だった場合のみ、そのコンボの実績
+    # (uses/total_score)に反映する(採用されなかった候補は「実際に使われた」わけでは
+    # ないため反映しない)。
     combo_id = params.get("_combo_id")
     if combo_id:
         record_combo_result(combo_id, score.overall)

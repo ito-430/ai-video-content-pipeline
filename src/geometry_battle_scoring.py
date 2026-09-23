@@ -138,9 +138,9 @@ def _classify_duration(decision_seconds: float) -> str | None:
 
 
 def _hole_escape_dominant(result: SimResult) -> bool:
-    """2026-09-20、ユーザー指示: 「ただの生き残り戦(hole_fall)以外のルールで、そのルール
-    独自の脱落原因(ゾーン外/吸収/被弾/武器ダメージ等)でなく、穴や端から場外に落ちた
-    脱落の方が多い試合」を無条件で不合格にする(weapon_colosseum限定ではなく全ルール対象)。
+    """「ただの生き残り戦(hole_fall)以外のルールで、そのルール独自の脱落原因(ゾーン外/吸収/
+    被弾/武器ダメージ等)でなく、穴や端から場外に落ちた脱落の方が多い試合」を無条件で
+    不合格にする(weapon_colosseum限定ではなく全ルール対象)。
     hole_fallは「穴に落として脱落させる」こと自体がルールの核なので対象外にする。
     causeが記録されていない(古い形式の)elimination_orderエントリは判定対象から除外する
     (誤検知で不要に不合格を増やさないための安全側の扱い)。"""
@@ -151,8 +151,8 @@ def _hole_escape_dominant(result: SimResult) -> bool:
     return escaped > rule_specific
 
 
-# 2026-09-21、ユーザー指示「レイト・クライマックス・フィルター」対応: 「勝負の決着(最後の
-# 1体/1チームの撃破)」の直前の脱落が、決着フレームのこの割合以降に起きている必要がある。
+# レイト・クライマックス・フィルター: 「勝負の決着(最後の1体/1チームの撃破)」の直前の
+# 脱落が、決着フレームのこの割合以降に起きている必要がある。
 LATE_CLIMAX_THRESHOLD = 0.9
 
 
@@ -174,9 +174,9 @@ def _impression_pattern(result: SimResult) -> tuple[str, float]:
     脱落が終盤に偏っている(=最後まで拮抗していた)ほど「逆転劇/駆け引き」寄りとみなす簡易ヒューリスティック。
     goal_reach等、脱落が発生しないルールは別軸(サプライズ指数)側で評価する。
 
-    2026-09-09、ユーザー指示: 「プレイヤー同士が一度も干渉(衝突)しないまま、各自が
-    バラバラに穴へ落ちる/脱落する」だけの決着は退屈なので、駆け引きが一切なかった
-    「無干渉の自滅」として最低スコアに分類する(instant/no_eliminationより明確に低くする)。
+    「プレイヤー同士が一度も干渉(衝突)しないまま、各自がバラバラに穴へ落ちる/脱落する」
+    だけの決着は視聴体験として退屈なので、駆け引きが一切なかった「無干渉の自滅」として
+    最低スコアに分類する(instant/no_eliminationより明確に低くする)。
     """
     elim_count = len(result.elimination_order)
     total_frames = result.decided_frame or 1
@@ -200,9 +200,8 @@ def _surprise_index(result: SimResult) -> float:
     プレースホルダー実装。本来は視聴者の予測モデルが必要だが、このプロトタイプ段階では
     「衝突が多い=最後まで誰が勝つか読めない=サプライズが高い」とみなす。
 
-    2026-09-09、ユーザー指示: 「サプライズ指数のハードルを引き上げる」対応として、
-    満点に必要な衝突頻度を6回/秒→9回/秒に引き上げた(単調な軌道での脱落が多い候補を
-    より厳しく減点し、順位変動・衝突が豊富なケースにのみ高スコアを付与する)。
+    満点に必要な衝突頻度は6回/秒→9回/秒に引き上げている(単調な軌道での脱落が多い候補を
+    より厳しく減点し、順位変動・衝突が豊富なケースにのみ高スコアを付与するため)。
     """
     if result.decided_frame is None or result.decided_frame == 0:
         return 0.0
@@ -260,7 +259,7 @@ def _stagnation_score(result: SimResult) -> float:
     return max(0.0, 1 - (max_gap_seconds - 3) / 10)
 
 
-# 2026-09-20、ユーザー指示: 「ドラマ評価フィルター」として3項目を追加。いずれも軽量シミュレーションの
+# 「ドラマ評価フィルター」として3項目を追加。いずれも軽量シミュレーションの
 # 座標ログ(result.frames)だけから算出でき、物理演算・レンダリングには一切影響しない
 # オフラインの候補選定用スコア(既存のimpression/surprise等と同じ立ち位置)。
 
@@ -410,16 +409,16 @@ def evaluate_candidate(result: SimResult, threshold: float = DEFAULT_THRESHOLD) 
     if not passed:
         reject_reason = "総合スコアがしきい値未満"
     if not within_gate:
-        # スコアが高くても無条件で不合格にする(2026-09-08、ユーザー指示の暫定フィルター)
+        # スコアが高くても無条件で不合格にする(尺フィルターとして分離した足切り)
         passed = False
         reject_reason = (
             f"決着まで{summary['decision_seconds']:.1f}秒"
             f"({gate_lo:.0f}〜{gate_hi:.0f}秒の暫定フィルター範囲外)"
         )
     if pattern == "no_interaction":
-        # 2026-09-09、ユーザー指示: 総合スコアが閾値を超えていても、プレイヤー同士が
-        # 一度も衝突しないまま決着した「無干渉の自滅」は無条件で不採用にする
-        # (尺フィルターと同種の無条件足切り。他項目の加点で相殺されて合格してしまうのを防ぐ)。
+        # 総合スコアが閾値を超えていても、プレイヤー同士が一度も衝突しないまま決着した
+        # 「無干渉の自滅」は無条件で不採用にする(尺フィルターと同種の無条件足切り。
+        # 他項目の加点で相殺されて合格してしまうのを防ぐ)。
         passed = False
         reject_reason = "プレイヤー同士の衝突が一度も発生しない無干渉の自滅だった"
 
@@ -432,14 +431,14 @@ def evaluate_candidate(result: SimResult, threshold: float = DEFAULT_THRESHOLD) 
         reject_reason = f"序盤{FIRST_IMPACT_MAX_SECONDS:.1f}秒以内に最初の衝突が発生しなかった(実際: {actual})"
 
     if _hole_escape_dominant(result):
-        # 2026-09-20、ユーザー指示: hole_fall以外で「そのルール独自の脱落」より「穴/端からの
-        # 場外脱落」の方が多い試合は無条件で不採用にする(weapon_colosseumに限らず全ルール対象)。
+        # hole_fall以外で「そのルール独自の脱落」より「穴/端からの場外脱落」の方が
+        # 多い試合は無条件で不採用にする(weapon_colosseumに限らず全ルール対象)。
         passed = False
         reject_reason = "そのルール独自の脱落より、穴/端からの場外脱落の方が多かった"
 
     if not _late_climax_ok(result):
-        # 2026-09-21、ユーザー指示「レイト・クライマックス・フィルター」: 決着直前の脱落が
-        # 試合の早い段階で終わっており、その後は消化試合になっていたと判断し無条件で不採用にする。
+        # 決着直前の脱落が試合の早い段階で終わっており、その後は消化試合になっていたと
+        # 判断し無条件で不採用にする(レイト・クライマックス・フィルター)。
         passed = False
         reject_reason = "決着直前の脱落が試合の早い段階で終わっており、消化試合になっていた"
 

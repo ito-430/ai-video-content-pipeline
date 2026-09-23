@@ -3,7 +3,7 @@
 
 Google Trends（pytrends）は非公式APIで不安定になりやすいため採用せず、既存の
 YouTube OAuth認証をそのまま使えて公式にサポートされているYouTube急上昇
-（videos.list(chart="mostPopular")、1件あたり1 unitと軽量）を使う（ユーザー選択、2026-07-15）。
+（videos.list(chart="mostPopular")、1件あたり1 unitと軽量）を採用している。
 
 急上昇動画のタイトルそのものは「日常のくだらないディベートのお題」の形をしていない
 ことが多いため、ingest_ideas.pyと同じis_usable+theme+categoryゲートでGeminiに

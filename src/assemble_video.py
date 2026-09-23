@@ -1702,8 +1702,8 @@ def _generate_panel_image(
     # 発話者キーごとの検出結果(0-1000正規化のbox_2d)をサイドカーJSONに保存しておく。
     # 台本のline_indexに紐付く前の生データなので、同じ画像を別の台本(例: 現代語訳版)
     # から参照する場合でも、話者キーの並び順さえ合っていればvision APIを再度呼ばずに
-    # 同じ吹き出し位置を再現できる(2026-09-19、ユーザーからの指摘: 画像と台本の対応が
-    # ずれていたことがあり、同じ画像を複数の台本で使い回す予定があるため要注意とのこと)。
+    # 同じ吹き出し位置を再現できる(画像と台本の対応がずれる事故が実際にあり、同じ画像を
+    # 複数の台本で使い回す運用のため要注意)。
     try:
         (asset_dir / f"panel{panel['id']}.detected.json").write_text(
             json.dumps({"image_size": [w, h], "by_speaker": by_speaker}, ensure_ascii=False, indent=2),
@@ -1850,7 +1850,7 @@ def _kobun_text_layer(text: str, font, color=(40, 28, 15, 255)) -> Image.Image:
 
 
 def render_kobun_long_opening_clip(w: int, h: int, episode_title: str, tmp_dir: Path, tag: str = "opening"):
-    """長尺動画共通のオープニング(約3秒、ユーザー指定のテンプレート、2026-09-19)。
+    """長尺動画共通のオープニング(約3秒の固定テンプレート)。
 
     「ことば先生【古文】」→「物語で覚える古文」→各話タイトルの順に、
     古紙色の背景の上へポップインで表示する。ページをめくる効果音付き。
@@ -1902,7 +1902,7 @@ def render_kobun_long_opening_clip(w: int, h: int, episode_title: str, tmp_dir: 
 
 
 def render_kobun_long_ending_clip(w: int, h: int, closing_line: str, tmp_dir: Path, tag: str = "ending"):
-    """長尺動画共通のエンディング(約7秒、ユーザー指定のテンプレート、2026-09-19)。
+    """長尺動画共通のエンディング(約7秒の固定テンプレート)。
 
     最初の2秒は各話の締めの一文(closing_line)、残り5秒は共通の次回予告画面
     「次回も、いとをかし。」「ことば先生【古文】」を表示する。共通画面は、
@@ -2218,8 +2218,8 @@ def assemble_kobun_scene_video(
     - ending_closing_line: 指定すると、末尾のループ演出の代わりに共通エンディング
       (`render_kobun_long_ending_clip`、最初の2秒はこの引数の締めの一文、残り5秒は
       共通の次回予告画面、約7秒)を追加する。
-      (2026-09-19、ユーザー指定のオープニング/エンディングテンプレート。長尺専用の想定で、
-      ショートは「テンポ優先で無しでよい」とのユーザー判断のためこの2引数は渡さない)。
+      (オープニング/エンディングテンプレートは長尺専用の想定で、ショートはテンポ優先で
+      無しにするため、この2引数は渡さない)。
 
     既知の制約(2026-09-16時点、テスト運用中):
     - 群衆の歓声・雨音・チャイム等の環境音素材はmaterials/se, materials/bgmに未用意のため
@@ -2498,7 +2498,7 @@ def assemble_kobun_scene_video(
         sequence = []
         cursor = 0.0
         if opening_episode_title:
-            # 長尺共通オープニング(2026-09-19、ユーザー指定テンプレート)。BGMのセグメント
+            # 長尺共通オープニング(固定テンプレート)。BGMのセグメント
             # 計算はscene_offsetsを使うため、ここでcursorを進めておけば自動的にずれない。
             opening_clip = render_kobun_long_opening_clip(OUT_W, OUT_H, opening_episode_title, tmp_dir)
             sequence.append(opening_clip)
@@ -2520,7 +2520,7 @@ def assemble_kobun_scene_video(
         if has_loop_transition:
             sequence.append(_scroll_transition_clip(scene_paths[-1], scene_paths[0], OUT_W, OUT_H, tmp_dir))
         elif ending_closing_line:
-            # 長尺共通エンディング(2026-09-19、ユーザー指定テンプレート)。前のシーンから
+            # 長尺共通エンディング(固定テンプレート)。前のシーンから
             # フェードで滑らかにつなぐ(コマ間のスクロール演出とは異なる、映像の締めらしい入り方)。
             ending_clip = render_kobun_long_ending_clip(OUT_W, OUT_H, ending_closing_line, tmp_dir)
             sequence.append(ending_clip.with_effects([CrossFadeIn(0.4)]))
@@ -2554,9 +2554,9 @@ def assemble_kobun_scene_video_all_variants(script_path: Path) -> dict[str, Path
     """1本の台本(現代語版+切り替え+古文版のscenes)から、長尺(16:9、台本まま)と
     ショート2本(9:16、現代文編/古文編、切り替えシーンは含めない)をまとめて組み立てる。
 
-    2026-09-19、ユーザー方針: 「長尺は現代文編+古文編を台本のまま。長尺公開後、
-    現代文編・古文編それぞれを別のショートとして出す。ショートの2本は同じコマ画像を
-    共有する。長尺とショートは画像サイズが違うのでそれぞれ別サイズで生成してよい」に対応。
+    構成方針: 長尺は現代文編+古文編を台本のまま。長尺公開後、現代文編・古文編それぞれを
+    別のショートとして出す。ショートの2本は同じコマ画像を共有する。長尺とショートは
+    画像サイズが違うのでそれぞれ別サイズで生成する。
 
     scenes[]の各要素に"variant"キー(値: "opening"(全出力共通の冒頭)/"modern"(現代語版)/
     "transition"(長尺内の切り替えのみ、ショートには含めない)/"classical"(古文版))が

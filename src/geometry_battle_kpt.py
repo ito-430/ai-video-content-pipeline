@@ -1,9 +1,9 @@
 """物理演算バトルチャンネル(4ch目/幾何学物理演算バトル)の週次KPT(Keep/Problem/Try)。
 
 1ch目のgenerate_kpt.py（意見交換フロー）を土台にしつつ、ch4向けに以下を変更している。
-- ユーザー要望（2026-09-09）でスコープを最小化: Discordの声の集約先は「アイデア出し」
-  1チャンネルのみ、投稿の実績通知（1ch目の「投稿通知」に相当する機能）は持たない。
-  高頻度でDiscordを見てもらう必要はないという前提のため、チャンネル構成自体を減らしている。
+- スコープを最小化: Discordの声の集約先は「アイデア出し」1チャンネルのみ、投稿の実績
+  通知（1ch目の「投稿通知」に相当する機能）は持たない。高頻度でDiscordを見てもらう
+  必要はないという前提のため、チャンネル構成自体を減らしている。
 - データ基盤がGoogle Sheetsではなくローカルの軽量JSON
   （geometry_battle_video_log.json / geometry_battle_character_stats.json）。
   投稿パイプラインがまだ手動運用で本数も少ないため、Sheets連携は過剰と判断した。
@@ -51,10 +51,10 @@ HISTORY_PATH = os.path.join(PROJECT_ROOT_ENV, "scripts_templates", "geometry_bat
 RETENTION_PATH = os.path.join(PROJECT_ROOT_ENV, "scripts_templates", "geometry_battle_retention.json")
 PEAKS_PATH = os.path.join(PROJECT_ROOT_ENV, "scripts_templates", "geometry_battle_kpi_peaks.json")
 
-# 2026-09-21、ユーザー指示「目標設定とKPTトラッキングの修正」対応: 「平均視聴率95%」という
-# 固定目標を廃止し、直近の実績が過去の最高値(ピーク)を安定して超え、段階的に引き上げて
-# いるかを追跡する仕様に変更する。初期値はユーザーから提示された2026-09-21時点の実測ピーク
-# (維持率=average_view_percentage 45.1%、閲覧率=impression_ctr 61.7%)をシードとして使う。
+# 「平均視聴率95%」という固定目標を廃止し、直近の実績が過去の最高値(ピーク)を安定して
+# 超え、段階的に引き上げているかを追跡する仕様に変更した。初期値は2026-09-21時点の
+# 実測ピーク(維持率=average_view_percentage 45.1%、閲覧率=impression_ctr 61.7%)を
+# シードとして使う。
 DEFAULT_PEAKS = {
     "average_view_percentage": 45.1,
     "impression_ctr": 61.7,
@@ -299,11 +299,10 @@ def _retention_summary() -> str:
     return "\n".join(lines)
 
 
-# 2026-09-21、ユーザー指摘「rule以外の軸が関係している可能性も十分にあるので分析時は
-# 他の軸も見てみてください」への対応。ruleだけでなく、video_logに既に記録されている
-# 他の生成軸(shape=外枠の形/player_shape=プレイヤー本体の形/terrain=内部構造)についても
-# 同じ集計をかける。「rule単独では説明できない差」(例: 同じruleでもterrainによって
-# 視聴維持率が大きく変わる)を見逃さないようにする狙い。
+# ruleだけでなく、video_logに既に記録されている他の生成軸(shape=外枠の形/
+# player_shape=プレイヤー本体の形/terrain=内部構造)についても同じ集計をかける。
+# 「rule単独では説明できない差」(例: 同じruleでもterrainによって視聴維持率が
+# 大きく変わる)を見逃さないようにする狙い。
 ALGO_METRICS_AXES = [
     ("rule", "ルール"),
     ("shape", "外枠の形"),
@@ -368,9 +367,9 @@ def _algo_metrics_by_axis(axis: str, log: list[dict], retention: dict) -> str:
 
 
 def _algo_metrics_summary() -> str:
-    """2026-09-21、ユーザー指示「視聴維持率データに限らず、YouTubeアルゴリズムで有利になる
-    立ち回りを最大化するために必要なデータ収集・対策の考案ができるようにしたい」への対応。
-    rule/shape/player_shape/terrainの4軸それぞれで、サマリー指標を集計して並べる。"""
+    """視聴維持率データに限らず、YouTubeアルゴリズムで有利になる立ち回りを最大化するために
+    必要なデータを揃える集計。rule/shape/player_shape/terrainの4軸それぞれで、
+    サマリー指標を集計して並べる。"""
     retention = _load_retention_data()
     if retention is None:
         return "(まだデータがありません)"
@@ -440,10 +439,9 @@ _PEAK_METRIC_LABELS = {
 
 
 def _peak_progress_summary(cutoff: datetime) -> str:
-    """2026-09-21、ユーザー指示「目標の相対化」対応: 固定の絶対目標(旧: 平均視聴率95%)では
-    なく、直近実績が過去のピークを安定して超え、段階的に引き上げられているかを追跡する。
-    ピークを更新した場合は状態ファイルに反映し、次回以降の比較基準そのものを引き上げる
-    (=目標が動的に相対化される)。"""
+    """固定の絶対目標(旧: 平均視聴率95%)ではなく、直近実績が過去のピークを安定して超え、
+    段階的に引き上げられているかを追跡する。ピークを更新した場合は状態ファイルに反映し、
+    次回以降の比較基準そのものを引き上げる(=目標が動的に相対化される)。"""
     peaks_data = _load_peaks()
     peaks = peaks_data["peaks"]
     recent = _weighted_recent_metrics(cutoff)
