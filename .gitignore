@@ -1,0 +1,13 @@
+.env
+*client_secret*.json
+*token*.json
+discord_token.txt
+service_account.json
+
+__pycache__/
+*.pyc
+.claude/settings.local.json
+
+# 生成物(動画・音声等)。ポートフォリオには含めない
+output/
+materials/

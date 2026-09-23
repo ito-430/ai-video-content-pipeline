@@ -1,0 +1,102 @@
+{
+  "theme": "エレベーターと階段、健康のためならどちらを選ぶべきか",
+  "angle": "効率と健康投資のトレードオフ、日常の小さな選択にどう向き合うか",
+  "bg_query": "office building elevator hall",
+  "format": "shorts",
+  "battle_style": "normal",
+  "target_duration_sec": 55,
+  "dady_appearance": false,
+  "outcome": {
+    "winner": "ren",
+    "score": "6:4"
+  },
+  "lines": [
+    {
+      "order": 1,
+      "character": "mailo",
+      "emotion": "smile",
+      "text": "本日のテーマ、エレベーターと階段どっち派！",
+      "est_duration_sec": 3.5,
+      "se": "none",
+      "visual_aid": ""
+    },
+    {
+      "order": 2,
+      "character": "ren",
+      "emotion": "base",
+      "text": "統計的に見て、日常の階段利用は最も手軽な運動習慣だ。合理的に階段一択。",
+      "est_duration_sec": 5,
+      "se": "attack",
+      "visual_aid": "graph"
+    },
+    {
+      "order": 3,
+      "character": "mailo",
+      "emotion": "smile",
+      "text": "でもさ、時間がない朝はエレベーターの方が正解でしょ。",
+      "est_duration_sec": 4.5,
+      "se": "none",
+      "visual_aid": ""
+    },
+    {
+      "order": 4,
+      "character": "ren",
+      "emotion": "dissatisfaction",
+      "text": "それは短期の都合と長期の健康を混同している。1分の差より積み重ねが重要だ。",
+      "est_duration_sec": 5.5,
+      "se": "logic_ding",
+      "visual_aid": ""
+    },
+    {
+      "order": 5,
+      "character": "baku",
+      "emotion": "base",
+      "text": "二人とも、結局は何階まで行くか次第だろ。才能の無駄遣いだよ。",
+      "est_duration_sec": 5.5,
+      "se": "stumble",
+      "visual_aid": ""
+    },
+    {
+      "order": 6,
+      "character": "noa",
+      "emotion": "fun",
+      "text": "すごい！どっちの意見も生活に寄り添ってて、すごく素敵だね！",
+      "est_duration_sec": 4.5,
+      "se": "chaos",
+      "visual_aid": ""
+    },
+    {
+      "order": 7,
+      "character": "ren",
+      "emotion": "smile",
+      "text": "結局、積み重ねの方が勝つんだ。論理的にはこれが正解。",
+      "est_duration_sec": 4.5,
+      "se": "win_fanfare",
+      "visual_aid": ""
+    },
+    {
+      "order": 8,
+      "character": "noa",
+      "emotion": "littlesmile",
+      "text": "あなたはどっち派？コメントで教えてね！",
+      "est_duration_sec": 3,
+      "se": "none",
+      "visual_aid": ""
+    }
+  ],
+  "title_candidates": [
+    "エレベーター vs 階段、健康の正解はどっち？",
+    "1日の小さな選択が未来を変える！？"
+  ],
+  "thumbnail_hooks": [
+    "その一歩、階段でいい？",
+    "効率 vs 健康投資"
+  ],
+  "description_summary": "エレベーターと階段、あなたはどちらを選ぶ？日々の小さな選択をめぐる白熱ディベート（サンプル台本）。",
+  "hashtags": [
+    "健康習慣",
+    "ライフハック",
+    "ディベート"
+  ],
+  "opening_line_count": 1
+}

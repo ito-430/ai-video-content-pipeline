@@ -1,0 +1,182 @@
+"""SimuSphere Arena(4ch目)版のKPTスレッド意見交換フォローアップ。
+
+1ch目のfollow_up_kpt.pyと同じロジックだが、状態ファイル・履歴ファイル・Discord
+チャンネルをch4専用のものに差し替えている（scripts_templates/geometry_battle_kpt_state.json /
+geometry_battle_kpt_history.jsonはch1のkpt_state.json等と完全に独立しており、混ざらない）。
+
+数時間おき（を想定した頻度）に実行する:
+- 元メッセージに✅/❌リアクションが付いていれば、その時点の最新案で確定（承認/却下）し、
+  履歴ファイルの judgment/status を更新する。
+- リアクションがまだ無く、スレッドにユーザーからの新しい返信がある場合は、
+  これまでの提案+会話ログを踏まえてGeminiが改訂案を作り、スレッドに再提示する。
+
+「承認」が確定した後の、実際の生成パラメータへの反映自体はここでは行わない
+（コード変更を伴う判断のため、Claude Codeセッションでの別途対応が必要）。
+"""
+
+import json
+import sys
+
+from ai_provider import get_text_provider
+from discord_client import add_reaction_by_id, channel_id, get_messages_by_id, get_reaction_users_by_id, post_to_thread
+from geometry_battle_kpt import (
+    KPT_CHANNEL,
+    MODEL_NAME,
+    REVISION_SCHEMA,
+    _load_history,
+    _load_state,
+    _save_history,
+    _save_state,
+    format_try_item,
+)
+from shared_knowledge import extract_success_pattern
+
+CHANNEL_NAME = "SimuSphere Arena"
+
+REVISION_SYSTEM_PROMPT = """\
+あなたは幾何学図形の物理演算バトル動画チャンネル（SimuSphere Arena）のディレクターです。
+先週提案した「Try」項目について、担当者とのDiscordスレッドで意見交換が行われています。
+これまでの提案内容と、会話ログ（ユーザー・Botのやり取り）を踏まえて、Try項目一覧を改訂してください。
+
+## 絶対厳守（改訂後も全項目に適用。少しでも抵触の疑いがあればis_safeをfalseにすること）
+1. 永久的な収益の最大化を優先すること（短期的な変化で継続成長を犠牲にしない）
+2. 炎上・アカウント停止・個人情報漏洩リスクをゼロにすること
+
+## 刺激性のある提案への対応
+「刺激的」「インパクトを強める」等、炎上・賛否のリスクが少しでもある提案には、
+risk_levelを"mild"にした上で、変更前(before_example)と変更後(after_example)の
+具体的な設定・パラメータ例を必ず添えること。リスクがない提案はrisk_level="none"でよい。
+
+## ユーザーの意見の反映
+会話ログでユーザーが指摘した懸念・要望を可能な限り反映し、納得してもらえる改訂案にすること。
+ユーザーが明確に不要と言った項目は削除し、新しい提案が示唆されていれば追加してもよい。
+項目数は元の提案からむやみに増やさないこと（2〜4件程度を目安にする）。
+"""
+
+
+def _finalize(state: dict, pending: dict, approve_count: int, reject_count: int) -> None:
+    if approve_count > reject_count:
+        judgment, status = "承認", "承認（実際のパラメータ反映はClaude Codeセッションで別途対応）"
+        note = "✅ この案で承認として記録しました。実際の反映は次回の開発セッションで対応します。"
+    elif reject_count > approve_count:
+        judgment, status = "却下", "見送り"
+        note = "❌ 今回は見送りとして記録しました。"
+    else:
+        print("[SimuSphere KPT] ✅❌のリアクション数が同数のため、今回は確定を見送ります。")
+        return
+
+    history = _load_history()
+    idx = pending["history_index"]
+    history[idx]["judgment"] = judgment
+    history[idx]["status"] = status
+    _save_history(history)
+
+    if pending.get("thread_id"):
+        try:
+            post_to_thread(pending["thread_id"], note)
+        except Exception as e:
+            print(f"[警告] スレッドへの確定通知に失敗しました: {e}", file=sys.stderr)
+
+    if judgment == "承認":
+        try:
+            extract_success_pattern(pending.get("keep", []), channel_name=CHANNEL_NAME)
+        except Exception as e:
+            print(f"[警告] 成功パターンの抽出に失敗しました: {e}", file=sys.stderr)
+
+    pending["resolved"] = True
+    state["pending"] = pending
+
+
+def _revise_try_items(pending: dict, transcript: str) -> list[dict]:
+    contents = (
+        f"現在のTry提案一覧:\n{json.dumps(pending.get('try_items', []), ensure_ascii=False, indent=2)}\n\n"
+        f"Discordスレッドでの会話ログ:\n{transcript}\n\n"
+        "上記を踏まえてTry提案一覧を改訂してください。"
+    )
+    provider = get_text_provider(MODEL_NAME)
+    data = provider.generate_json(REVISION_SYSTEM_PROMPT, contents, REVISION_SCHEMA)
+    return [t for t in data.get("try_items", []) if t.get("is_safe")]
+
+
+def main():
+    state = _load_state()
+    pending = state.get("pending")
+    if not pending or pending.get("resolved"):
+        print("[SimuSphere KPT] 意見交換中のKPTはありません。")
+        return
+
+    target = pending.get("current_reaction") or {
+        "channel_id": channel_id(KPT_CHANNEL),
+        "message_id": pending["message_id"],
+    }
+    try:
+        checks = get_reaction_users_by_id(target["channel_id"], target["message_id"], "✅")
+        crosses = get_reaction_users_by_id(target["channel_id"], target["message_id"], "❌")
+    except Exception as e:
+        print(f"[警告] リアクション取得に失敗しました: {e}", file=sys.stderr)
+        checks, crosses = [], []
+
+    # Bot自身が最初に付けた✅❌の分を差し引く
+    approve_count = max(len(checks) - 1, 0)
+    reject_count = max(len(crosses) - 1, 0)
+
+    if approve_count > 0 or reject_count > 0:
+        _finalize(state, pending, approve_count, reject_count)
+        _save_state(state)
+        return
+
+    if not pending.get("thread_id"):
+        print("[SimuSphere KPT] スレッドが存在しないため、意見交換なしで✅❌の確定待ちです。")
+        return
+
+    messages = get_messages_by_id(pending["thread_id"], limit=100)
+    user_messages = [m for m in messages if not m.get("author", {}).get("bot") and (m.get("content") or "").strip()]
+    last_seen = pending.get("last_seen_thread_msg_id")
+    new_user_messages = (
+        [m for m in user_messages if int(m["id"]) > int(last_seen)] if last_seen else user_messages
+    )
+
+    if not new_user_messages:
+        print("[SimuSphere KPT] スレッドに新しい意見はまだありません。")
+        return
+
+    transcript = "\n".join(
+        f"{'ユーザー' if not m.get('author', {}).get('bot') else 'Bot'}: {m.get('content', '')}" for m in messages
+    )
+
+    try:
+        revised = _revise_try_items(pending, transcript)
+    except Exception as e:
+        print(f"[警告] 改訂案の生成に失敗しました: {e}", file=sys.stderr)
+        return
+
+    try_text = "\n".join(format_try_item(t) for t in revised) or "(提案なし)"
+    reply = (
+        "🔄 いただいたご意見を踏まえた改訂案です。\n\n"
+        f"■Try（改訂版）\n{try_text}\n\n"
+        "この案で進めてよければ✅、まだ調整したい場合はこのスレッドで続けて教えてください。"
+    )
+    posted_reply = post_to_thread(pending["thread_id"], reply)
+    for emoji in ("✅", "❌"):
+        try:
+            add_reaction_by_id(pending["thread_id"], posted_reply["id"], emoji)
+        except Exception:
+            pass
+
+    history = _load_history()
+    history[pending["history_index"]]["try_items"] = revised
+    _save_history(history)
+
+    pending["try_items"] = revised
+    pending["last_seen_thread_msg_id"] = max(int(m["id"]) for m in messages)
+    # 以降の✅❌確定判定は、今回の改訂返信メッセージに対して行う
+    pending["current_reaction"] = {"channel_id": pending["thread_id"], "message_id": posted_reply["id"]}
+    state["pending"] = pending
+    _save_state(state)
+    print("[SimuSphere KPT] 改訂案をスレッドに投稿しました。")
+
+
+if __name__ == "__main__":
+    from alerting import run_with_alert
+
+    run_with_alert(main, "geometry_battle_kpt_followup.py")
