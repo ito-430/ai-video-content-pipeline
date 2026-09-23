@@ -46,6 +46,16 @@
 
 `scripts_templates/scripts/` には、台本JSONのスキーマを示すための架空のサンプルのみを置いている。
 
+### importの解決範囲について
+
+`geometry_battle_*.py`(フラッグシップ実装)一式と、共通基盤(`ai_provider.py`, `api_usage.py`,
+`schema.py`, `ng_word_filter.py`, `content_self_check.py`, `diversity_guard.py`, `pii_filter.py`,
+`youtube_upload.py`)は、`pip install -r requirements.txt` だけでローカルのimportが完結する
+(実行にはYouTube/Gemini等の認証情報が別途必要)。一方、討論バラエティ形式の台本生成・KPT関連の
+一部ファイルは、Discord通知・Google Sheets連携・チャンネル横断の共有状態といった、この抜粋には
+含めていない周辺インフラのモジュールをimportしている。これらは技術的な新規性が低い連携部分の
+ため、意図的に本リポジトリのスコープ外としている。
+
 ## 技術スタック
 
 - 言語: Python
