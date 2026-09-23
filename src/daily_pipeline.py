@@ -38,7 +38,7 @@ from video_log import record_published_video
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 WILD_QUEUE_PATH = PROJECT_ROOT / "scripts_templates" / "wild_premise_queue.txt"
 BALANCE_STATE_PATH = PROJECT_ROOT / "scripts_templates" / "theme_balance_state.json"
-DEFAULT_WILD_RATIO = 0.6  # 通常:突飛 = 2:3 が既定（2026-07-15、ユーザー指示によりコメントを稼ぎやすい突飛テーマを主軸に引き上げ）
+DEFAULT_WILD_RATIO = 0.6  # 通常:突飛 = 2:3 が既定（突飛テーマの方がコメント欄での反応率が高い傾向があり、エンゲージメント重視で主軸寄りに設定）
 
 DEFAULT_TARGET_DURATION = 55
 # NGワード検出時に何回まで「別のテーマを選び直して」作り直すか（2026-07-14追加）。

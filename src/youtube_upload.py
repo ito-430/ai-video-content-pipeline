@@ -15,13 +15,23 @@
 """
 
 import argparse
+import random
+import time
 from pathlib import Path
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
 from googleapiclient.http import MediaFileUpload
+
+# resumable uploadのnext_chunk()はチャンク単位でHTTPリクエストを送るため、動画1本(数十MB〜)の
+# アップロード中に一時的な5xxやネットワーク瞬断が起きる確率は無視できない。Google公式が
+# resumable uploadに対して推奨する指数バックオフ+ジッターでのリトライをここに実装し、
+# 日次投稿パイプライン全体が一時的な通信エラーだけで丸ごと落ちないようにする。
+UPLOAD_RETRIABLE_STATUS_CODES = {500, 502, 503, 504}
+UPLOAD_MAX_RETRIES = 5
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 CLIENT_SECRET_PATH = PROJECT_ROOT / "materials" / "youtube_client_secret.json"
@@ -142,8 +152,22 @@ def upload_video(
     request = youtube.videos().insert(part="snippet,status", body=body, media_body=media)
 
     response = None
+    retry_count = 0
     while response is None:
-        status, response = request.next_chunk()
+        try:
+            status, response = request.next_chunk()
+        except HttpError as e:
+            if e.resp.status not in UPLOAD_RETRIABLE_STATUS_CODES or retry_count >= UPLOAD_MAX_RETRIES:
+                raise
+            # 指数バックオフ+ジッター。ジッターを入れるのは、同時刻にスケジュールされた
+            # 複数チャンネルの投稿ジョブが同じタイミングで一斉リトライして再び輻輳するのを防ぐため。
+            sleep_sec = (2 ** retry_count) + random.uniform(0, 1)
+            print(f"アップロード中にHTTP {e.resp.status}。{sleep_sec:.1f}秒後にリトライします({retry_count + 1}/{UPLOAD_MAX_RETRIES})")
+            time.sleep(sleep_sec)
+            retry_count += 1
+            continue
+
+        retry_count = 0  # 直前のチャンクが成功したらリトライカウントをリセットする
         if status:
             print(f"アップロード中... {int(status.progress() * 100)}%")
 

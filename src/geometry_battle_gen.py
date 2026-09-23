@@ -5214,9 +5214,9 @@ BGM_MAX_BPM = 150.0
 
 
 def _synth_bgm(total_seconds: float, decided_seconds: float | None, volume: float = BGM_VOLUME) -> np.ndarray:
-    """背景に薄く敷くプレースホルダーBGM(企画書3章の「BGMのテンポ・緊張感」軸の簡易実装)。
+    """背景に薄く敷くプレースホルダーBGM(「テンポで緊張感を演出する」というBGM設計方針の簡易実装)。
     持続的な低音パッドの上に、決着に近づくほどテンポが上がる短いパルスを重ねることで
-    緊張感の高まりを表現する。本番のブランディング用BGM(6章)ではない。
+    緊張感の高まりを表現する。本番投稿用のブランディングBGMへの差し替えは別途想定している。
     """
     n = int(total_seconds * SAMPLE_RATE)
     if n <= 0:

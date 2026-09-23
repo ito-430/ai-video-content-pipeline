@@ -18,7 +18,7 @@ SCRIPT_SCHEMA = {
             "properties": {
                 "winner": {
                     "type": "string",
-                    "enum": ["ren", "mailo", "noa", "baku", "dady", "draw", "both_lose"],
+                    "enum": ["touma", "yuzu", "sora", "kai", "dady", "draw", "both_lose"],
                 },
                 "score": {"type": "string", "description": "例: 7:3"},
             },
@@ -33,7 +33,7 @@ SCRIPT_SCHEMA = {
             "items": {
                 "type": "object",
                 "properties": {
-                    "character": {"type": "string", "enum": ["ren", "mailo", "noa", "baku", "dady"]},
+                    "character": {"type": "string", "enum": ["touma", "yuzu", "sora", "kai", "dady"]},
                     "stance": {
                         "type": "string",
                         "description": "8〜14文字程度の簡潔な立場ラベル（例: 効率重視で賛成派）。フルセンテンスにしないこと",
@@ -50,7 +50,7 @@ SCRIPT_SCHEMA = {
                     "order": {"type": "integer"},
                     "character": {
                         "type": "string",
-                        "enum": ["ren", "mailo", "noa", "baku", "dady"],
+                        "enum": ["touma", "yuzu", "sora", "kai", "dady"],
                     },
                     "emotion": {"type": "string"},
                     "text": {"type": "string"},
@@ -104,7 +104,7 @@ SCRIPT_SCHEMA = {
                 },
                 "character": {
                     "type": "string",
-                    "enum": ["ren", "mailo", "noa", "baku", "dady"],
+                    "enum": ["touma", "yuzu", "sora", "kai", "dady"],
                     "description": "その事実を語ったキャラクター",
                 },
                 "fact_summary": {

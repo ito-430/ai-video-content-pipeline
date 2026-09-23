@@ -42,7 +42,7 @@ WIN_STATS_PATH = PROJECT_ROOT / "scripts_templates" / "win_stats.json"
 MODEL_NAME = "gemini-flash-lite-latest"  # gemini-2.5-flashは新規APIキーでは提供終了(404)。gemini-flash-latestは断続的に503が続いたため、より安価で当面安定しているlite版を採用
 
 # オープニングの「今日のテーマ」表明を任せるキャラ候補（ダディは対象外）
-OPENING_SPEAKER_POOL = ["ren", "mailo", "noa", "baku"]
+OPENING_SPEAKER_POOL = ["touma", "yuzu", "sora", "kai"]
 OPENING_TWO_SPEAKER_PROBABILITY = 0.3
 
 
@@ -58,7 +58,7 @@ def load_win_stats() -> dict:
             return json.loads(WIN_STATS_PATH.read_text(encoding="utf-8"))
         except (json.JSONDecodeError, OSError):
             pass
-    return {"ren": 0, "mailo": 0}
+    return {"touma": 0, "yuzu": 0}
 
 
 def save_win_stats(stats: dict) -> None:
@@ -68,11 +68,11 @@ def save_win_stats(stats: dict) -> None:
 
 def win_bias_hint(stats: dict) -> str:
     """トウマとユズの勝率が偏りすぎないよう、劣勢側を軽く後押しするヒントを返す。"""
-    diff = stats.get("ren", 0) - stats.get("mailo", 0)
+    diff = stats.get("touma", 0) - stats.get("yuzu", 0)
     if diff >= 2:
-        return "mailo"
+        return "yuzu"
     if diff <= -2:
-        return "ren"
+        return "touma"
     return ""
 
 
@@ -97,7 +97,7 @@ def build_system_prompt() -> str:
 
     lines += [
         "## 動画の基本構成",
-        "- 基本形はトウマ(ren) vs ユズ(mailo)の対面ディベート。",
+        "- 基本形はトウマ(touma) vs ユズ(yuzu)の対面ディベート。",
         "- ソラ(noa)は全員に共感して対立を丸め込む役。これは議論を放り出しているのではなく、",
         "  「勝敗を明確にしないまま両者を肯定して締める」という、このチャンネル独自の着地の仕方",
         "  そのものである。ソラの一言が入ることで、視聴者には『ここで今回の話は収まった』と",
@@ -399,7 +399,7 @@ def generate_script(
     data = validate_and_fix(data)
 
     winner = data.get("outcome", {}).get("winner")
-    if winner in ("ren", "mailo"):
+    if winner in ("touma", "yuzu"):
         win_stats[winner] = win_stats.get(winner, 0) + 1
         save_win_stats(win_stats)
 
@@ -439,7 +439,7 @@ def build_weekly_special_system_prompt() -> str:
         "1. 【今週のふりかえり】ソラ(noa)かカイ(baku)のどちらかが、ユーザープロンプトで渡される",
         "   今週の投稿ラインナップ（テーマと勝敗）を、1テーマにつき1〜2行程度で軽快に振り返る。",
         "   全部で6〜10行程度。単調な読み上げにせず、コメントを挟みながらテンポよく。",
-        "2. 【拡張ディベート本編】ユーザープロンプトで指定されたテーマで、トウマ(ren) vs ユズ(mailo)の",
+        "2. 【拡張ディベート本編】ユーザープロンプトで指定されたテーマで、トウマ(touma) vs ユズ(yuzu)の",
         "   ディベートを通常回よりも大幅に多いラウンド数（6〜9往復）で展開する。9分の尺を無理な",
         "   水増しではなく、実際の議論の深掘り・具体例の追加・ソラやカイの掛け合いの厚みで満たすこと。",
         "   通常回と同じ構成",
@@ -632,7 +632,7 @@ LORE_EXTRACTION_SCHEMA = {
             "items": {
                 "type": "object",
                 "properties": {
-                    "character": {"type": "string", "enum": ["ren", "mailo", "noa", "baku", "dady"]},
+                    "character": {"type": "string", "enum": ["touma", "yuzu", "sora", "kai", "dady"]},
                     "fact": {"type": "string", "description": "今後の台本生成でも一貫させるべき裏設定の要約"},
                 },
                 "required": ["character", "fact"],

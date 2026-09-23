@@ -3,7 +3,7 @@
 geometry_battle_gen.py(技術検証プロトタイプ)・geometry_battle_scoring.py(基準判定)・
 geometry_battle_characters.py(キャラクター性)を、実際の投稿へつなぐ本番エントリーポイント。
 
-流れ（企画書のパイプライン設計をそのまま実装）:
+流れ:
 1. ルール×形状×パラメータ×演出の組み合わせをCANDIDATE_COUNT件サンプリングし、
    軽量シミュレーション(simulate、描画なし)だけを実行する
 2. 基準判定(evaluate_candidate)でスコアリングし、合格したものの中から、直近投稿と
