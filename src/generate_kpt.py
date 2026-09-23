@@ -1,6 +1,6 @@
 """週次KPT（Keep/Problem/Try）を自動生成し、Discordの#kpt報告へ投稿してユーザーの承認を得る。
 
-## 絶対厳守のガードレール（project_analytics_kpt メモリ参照、KPTのTry提案すべてに優先する）
+## 絶対厳守のガードレール（KPTのTry提案すべてに優先する）
 1. 永久的な収益の最大値（短期バズより右肩上がりの継続を優先）
 2. 炎上・アカウント停止・個人情報漏洩リスクをゼロにする
 Try提案はこの2点に抵触しないかをGeminiに自己判定させ、抵触の疑いがあるものは機械的に除外し、
@@ -207,7 +207,7 @@ def _theme_type_comparison(recent_videos: list[list]) -> str:
 
 
 def _competitor_benchmark_summary() -> str:
-    """競合チャンネル・競合動画スタイル分析（[[project-theme-engine]]）の結果を要約し、
+    """競合チャンネル・競合動画スタイル分析の結果を要約し、
     KPTのTry提案が競合比較を踏まえられるようにする。両ファイルとも週次自動更新（discover-competitors.yml）。"""
     if not os.path.exists(COMPETITOR_CHANNELS_PATH):
         return "(競合チャンネルデータはまだありません)"

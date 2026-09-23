@@ -1,4 +1,4 @@
-"""SimuSphere Arena(4ch目)の新規「組み合わせアイデア」生成エンジン。
+"""物理演算バトルチャンネル(4ch目)の新規「組み合わせアイデア」生成エンジン。
 
 ユーザー要望(2026-09-09)「特殊能力・ステージ・ルール等の新しいアイデアがいろいろ出てくる
 仕組み」への対応。ただし実際に安全に自動化できるのは、既存の物理演算コード(simulate())が
@@ -65,8 +65,7 @@ RULES = ["hole_fall", "goal_reach", "area_control", "absorb_growth"]
 SHAPES = ["square", "circle"]
 PALETTES = ["vivid", "pastel", "neon", "sunset"]
 
-# 数値パラメータの安全なレンジ。既存チューニング済みデフォルト(project_geometry_battle_channel
-# メモリ参照)を中心に、破綻しない範囲でGeminiに提案させる。ability_paramsはABILITY_PARAM_SCHEMA
+# 数値パラメータの安全なレンジ。既存チューニング済みデフォルトを中心に、破綻しない範囲でGeminiに提案させる。ability_paramsはABILITY_PARAM_SCHEMA
 # (geometry_battle_gen.py)を流用する。gravity/windは2026-09-09の枠縮小(_ARENA_SCALE)に
 # 合わせて比例縮小している。
 SAFE_RANGES = {
@@ -161,7 +160,7 @@ BATCH_SCHEMA = {
 }
 
 SYSTEM_PROMPT = f"""\
-あなたは幾何学図形の物理演算バトル動画チャンネル(SimuSphere Arena)のゲームデザイナーです。
+あなたは幾何学図形の物理演算バトル動画チャンネル(物理演算バトルチャンネル)のゲームデザイナーです。
 既存の物理演算パラメータの新しい組み合わせを提案し、動画のバリエーションを増やしてください。
 
 ## 前提(既存の実装)

@@ -1,7 +1,7 @@
 """季節のイベント・記念日・国民の祝日に沿ったディベートのお題を自動でテーマプールに追加する。
 
 日次で実行し、数日先までの間近なイベントを検知したら、Geminiでイベントにちなんだ
-お題に変換してscripts_templates/theme_pool.json（[[project-theme-engine]]のスコアリング
+お題に変換してscripts_templates/theme_pool.json（スコアリング
 プール）に追加する。コンプライアンス重視で、宗教的・政治的に踏み込んだ内容や特定ブランドを
 想起させる内容は棄却する（ingest_ideas.pyと同じis_usable+theme+categoryゲートを共有）。
 

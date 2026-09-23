@@ -1,4 +1,4 @@
-"""SimuSphere Arena(4ch目)版のKPTスレッド意見交換フォローアップ。
+"""物理演算バトルチャンネル(4ch目)版のKPTスレッド意見交換フォローアップ。
 
 1ch目のfollow_up_kpt.pyと同じロジックだが、状態ファイル・履歴ファイル・Discord
 チャンネルをch4専用のものに差し替えている（scripts_templates/geometry_battle_kpt_state.json /
@@ -31,10 +31,10 @@ from geometry_battle_kpt import (
 )
 from shared_knowledge import extract_success_pattern
 
-CHANNEL_NAME = "SimuSphere Arena"
+CHANNEL_NAME = "物理演算バトルチャンネル"
 
 REVISION_SYSTEM_PROMPT = """\
-あなたは幾何学図形の物理演算バトル動画チャンネル（SimuSphere Arena）のディレクターです。
+あなたは幾何学図形の物理演算バトル動画チャンネル（物理演算バトルチャンネル）のディレクターです。
 先週提案した「Try」項目について、担当者とのDiscordスレッドで意見交換が行われています。
 これまでの提案内容と、会話ログ（ユーザー・Botのやり取り）を踏まえて、Try項目一覧を改訂してください。
 
@@ -62,7 +62,7 @@ def _finalize(state: dict, pending: dict, approve_count: int, reject_count: int)
         judgment, status = "却下", "見送り"
         note = "❌ 今回は見送りとして記録しました。"
     else:
-        print("[SimuSphere KPT] ✅❌のリアクション数が同数のため、今回は確定を見送ります。")
+        print("[battle KPT] ✅❌のリアクション数が同数のため、今回は確定を見送ります。")
         return
 
     history = _load_history()
@@ -102,7 +102,7 @@ def main():
     state = _load_state()
     pending = state.get("pending")
     if not pending or pending.get("resolved"):
-        print("[SimuSphere KPT] 意見交換中のKPTはありません。")
+        print("[battle KPT] 意見交換中のKPTはありません。")
         return
 
     target = pending.get("current_reaction") or {
@@ -126,7 +126,7 @@ def main():
         return
 
     if not pending.get("thread_id"):
-        print("[SimuSphere KPT] スレッドが存在しないため、意見交換なしで✅❌の確定待ちです。")
+        print("[battle KPT] スレッドが存在しないため、意見交換なしで✅❌の確定待ちです。")
         return
 
     messages = get_messages_by_id(pending["thread_id"], limit=100)
@@ -137,7 +137,7 @@ def main():
     )
 
     if not new_user_messages:
-        print("[SimuSphere KPT] スレッドに新しい意見はまだありません。")
+        print("[battle KPT] スレッドに新しい意見はまだありません。")
         return
 
     transcript = "\n".join(
@@ -173,7 +173,7 @@ def main():
     pending["current_reaction"] = {"channel_id": pending["thread_id"], "message_id": posted_reply["id"]}
     state["pending"] = pending
     _save_state(state)
-    print("[SimuSphere KPT] 改訂案をスレッドに投稿しました。")
+    print("[battle KPT] 改訂案をスレッドに投稿しました。")
 
 
 if __name__ == "__main__":

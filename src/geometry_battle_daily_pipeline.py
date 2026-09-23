@@ -1,8 +1,7 @@
-"""SimuSphere Arena(4ch目)の日次自動投稿パイプライン。
+"""物理演算バトルチャンネル(4ch目)の日次自動投稿パイプライン。
 
 geometry_battle_gen.py(技術検証プロトタイプ)・geometry_battle_scoring.py(基準判定)・
 geometry_battle_characters.py(キャラクター性)を、実際の投稿へつなぐ本番エントリーポイント。
-[[project_geometry_battle_channel]]参照。
 
 流れ（企画書のパイプライン設計をそのまま実装）:
 1. ルール×形状×パラメータ×演出の組み合わせをCANDIDATE_COUNT件サンプリングし、
@@ -166,7 +165,7 @@ PALETTES = ["vivid", "pastel", "neon", "sunset"]
 # trackingの実装自体はgeometry_battle_gen.pyに残しているが、本番の候補生成では選ばない。
 CAMERAS = ["fixed"]
 
-# project_geometry_battle_channelメモリのチューニング結果に基づく、rule/shapeごとの推奨上書き値。
+# 実運用のチューニング結果に基づく、rule/shapeごとの推奨上書き値。
 # 2026-09-09、枠の真円/正方形化(ARENA_HALF_EXTENT基準)に伴い枠のサイズが縮小されたため、
 # 全ルールを実際にシミュレーションし直して数値を再調整した。あわせて2つの問題を発見・修正:
 # - area_controlのelasticity/damping上書きが漏れていた(前回セッションで発覚・修正済み)
@@ -452,14 +451,14 @@ def select_candidate(rng: random.Random):
         if passed:
             break
         print(
-            f"[SimuSphere daily] {batch + 1}/{MAX_CANDIDATE_BATCHES}バッチ(計{len(scored)}件)で、"
+            f"[battle daily] {batch + 1}/{MAX_CANDIDATE_BATCHES}バッチ(計{len(scored)}件)で、"
             "基準判定(20〜40秒の尺フィルター含む)に合格した候補がありませんでした。",
             file=sys.stderr,
         )
 
     if not passed:
         print(
-            "[SimuSphere daily] 再サンプリングしても合格候補が見つかりませんでした。"
+            "[battle daily] 再サンプリングしても合格候補が見つかりませんでした。"
             "無投稿を避けるため尺条件を無視して最高スコアの候補で妥協します(要確認)。",
             file=sys.stderr,
         )

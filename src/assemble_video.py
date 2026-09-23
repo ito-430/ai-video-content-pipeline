@@ -245,7 +245,7 @@ def fetch_background_image(query: str):
         resp = requests.get(
             OPENVERSE_ENDPOINT,
             params={"q": query, "license": "by,cc0", "mature": "false", "page_size": 20},
-            headers={"User-Agent": "youtube-system/0.1 (background image fetch)"},
+            headers={"User-Agent": "ai-video-pipeline/0.1 (background image fetch)"},
             timeout=10,
         )
         resp.raise_for_status()
@@ -260,7 +260,7 @@ def fetch_background_image(query: str):
         if _looks_branded(r.get("title") or ""):
             continue  # 商標・ブランドロゴが写り込んでいそうなためスキップ
         try:
-            img_resp = requests.get(url, timeout=10, headers={"User-Agent": "youtube-system/0.1"})
+            img_resp = requests.get(url, timeout=10, headers={"User-Agent": "ai-video-pipeline/0.1"})
             img_resp.raise_for_status()
             img = Image.open(BytesIO(img_resp.content)).convert("RGB")
         except Exception:
@@ -961,7 +961,7 @@ def assemble(script_path: Path) -> Path:
 # 生成回数を1コマあたり画像1回+吹き出し位置検出1回まで削減)。コマ内の各セリフ(line)は
 # 同じ1枚絵のまま、対応する吹き出しへセリフの文字だけをアフレコに合わせて順番に重ねる。
 # コマとコマの間は縦スクロール風のトランジションでつなぐ。詳細な設計判断は
-# project_kobun_channelメモリを参照。
+# 詳細な設計判断は別途ドキュメント化している。
 # ==========================================================================
 
 
@@ -1202,7 +1202,7 @@ VISION_TEXT_MODEL_NAME = "gemini-flash-lite-latest"
 KOBUN_SCROLL_TRANSITION_SECONDS = 0.45
 KOBUN_BGM_VOLUME = 0.08  # セリフの聞き取りやすさを優先して控えめに(ch1のBGM_VOLUMEと同じ考え方)
 
-# トウマ/イロハ/先生のビジュアル設定(project_kobun_channelメモリの「ビジュアル設定」セクションと同一)。
+# トウマ/イロハ/先生のビジュアル設定。
 # 1コマの合成マンガをGeminiに一度に描かせるためのキャラ外見の正本で、ここを直接編集すれば
 # 全コマの生成に反映される。
 KOBUN_CHARACTER_APPEARANCE = {
@@ -1794,7 +1794,7 @@ def _scroll_transition_clip(
 # (息子さん向け指示書)をもとに追加。フィードバック(2026-09-16)により、コマ内での
 # パン/ズーム(擬似カメラワーク)は「激しすぎる」「画像が見切れる」との指摘を受けて
 # 廃止し、各コマは出力フレームに収まる静止画として表示する。
-# 詳細な設計判断はproject_kobun_channelメモリを参照。
+# 詳細な設計判断は別途ドキュメント化している。
 # ==========================================================================
 
 

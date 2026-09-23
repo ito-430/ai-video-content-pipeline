@@ -1,9 +1,9 @@
 """毎日1本、テーマプールから台本生成→動画組み立て→YouTube投稿までを自動で行う。
 
 Windowsタスクスケジューラ等で1日1回このスクリプトを実行する想定
-（設定手順は project_youtube_upload メモリ / README相当のドキュメントを参照）。
+（設定手順は別途ドキュメント化している）。
 
-通常テーマは scripts_templates/theme_pool.json（[[project-theme-engine]]のスコアリング
+通常テーマは scripts_templates/theme_pool.json（スコアリング
 プール。Discord/季節イベント/コメント欄/YouTube急上昇/競合チャンネルの5ソースから
 供給される）から都度スコア最良の1件を選ぶ。机上の空論スタイルは今回のスコアリング対象外で、
 従来通り scripts_templates/wild_premise_queue.txt からFIFOで消費する。

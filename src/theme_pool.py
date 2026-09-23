@@ -1,4 +1,4 @@
-"""テーマ選定エンジンの中核（[[project-theme-engine]]の当初設計を実装）。
+"""テーマ選定エンジンの中核。
 
 複数ソース（Discord/季節イベント/コメント欄/YouTube急上昇/競合チャンネル）から
 集めた候補テーマを、単純なFIFOキューではなく、スコアリングして最良の1件を選ぶ
@@ -21,7 +21,7 @@ PUBLISHED_VIDEOS_PATH = PROJECT_ROOT / "scripts_templates" / "published_videos.j
 
 JST = timezone(timedelta(hours=9))
 
-# 元設計（project_theme_engine memory）のカテゴリ例を踏襲した固定タクソノミー。
+# 元設計のカテゴリ例を踏襲した固定タクソノミー。
 CATEGORIES = ["生活習慣", "お金", "人間関係", "食べ物", "デジタル・SNS", "仕事・学校", "その他"]
 
 # ソースごとの基本ボーナス。trendはtrend_score自体で既に評価されるためボーナス無し。

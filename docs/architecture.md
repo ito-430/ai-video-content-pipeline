@@ -18,7 +18,7 @@
 ## フォルダ構成
 
 ```
-youtube-system/
+ai-video-pipeline/
 ├── channels/
 │   ├── _template/                 # 新チャンネル追加時のひな形（コピー元）
 │   │   ├── channel.yaml           # id, 表示名, pipeline種別, YouTubeチャンネルID,

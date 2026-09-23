@@ -1,5 +1,5 @@
 """YouTube急上昇動画を、Geminiでディベートのお題に変換してテーマプールに追加する
-（[[project-theme-engine]]の当初設計「4ソース」のうち、トレンド分析を担当）。
+（当初設計の「4ソース」のうち、トレンド分析を担当）。
 
 Google Trends（pytrends）は非公式APIで不安定になりやすいため採用せず、既存の
 YouTube OAuth認証をそのまま使えて公式にサポートされているYouTube急上昇

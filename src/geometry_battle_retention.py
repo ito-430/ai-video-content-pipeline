@@ -1,4 +1,4 @@
-"""SimuSphere Arena(4ch目)の離脱曲線(視聴維持率カーブ)+YouTubeアルゴリズム有利指標の収集。
+"""物理演算バトルチャンネル(4ch目)の離脱曲線(視聴維持率カーブ)+YouTubeアルゴリズム有利指標の収集。
 
 8-7章「離脱曲線データの取得」対応。動画単位の再生数・全体維持率だけでなく、動画内の
 どの秒数(elapsedVideoTimeRatio)で離脱が集中しているかをYouTube Analytics APIから取得し、

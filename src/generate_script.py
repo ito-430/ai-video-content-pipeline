@@ -33,7 +33,7 @@ class SelfCheckFailed(Exception):
 
 class TooSimilarTheme(Exception):
     """再生成を1回試みても直近投稿とテーマ・切り口の類似度が閾値を超えたままの場合に送出する
-    （[[diversity_guard]]参照。入力テーマ自体が直近と本質的に同一の場合、言い回しを変える
+    （多様性ガード参照。入力テーマ自体が直近と本質的に同一の場合、言い回しを変える
     再生成だけでは解消しないため、テーマ選出からやり直す判断を呼び出し元に委ねる）。"""
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -246,7 +246,7 @@ CLOSING_STYLE_TOPIC_REQUEST_PROBABILITY = 0.4
 
 def draw_closing_style(recent_scripts: list[dict] | None = None) -> str:
     """締めパターンを抽選する。直近2本が同じパターン続きの場合は、量産感を避けるため
-    その回だけもう片方に固定する（多様性ガード、[[diversity_guard]]参照）。"""
+    その回だけもう片方に固定する（多様性ガードの仕組みを利用）。"""
     candidates = [CLOSING_STYLE_OPINION, CLOSING_STYLE_TOPIC_REQUEST]
     if recent_scripts is not None:
         recent_values = recent_closing_styles(recent_scripts)

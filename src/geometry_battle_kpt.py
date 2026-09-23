@@ -1,4 +1,4 @@
-"""SimuSphere Arena(4ch目/幾何学物理演算バトル)の週次KPT(Keep/Problem/Try)。
+"""物理演算バトルチャンネル(4ch目/幾何学物理演算バトル)の週次KPT(Keep/Problem/Try)。
 
 1ch目のgenerate_kpt.py（意見交換フロー）を土台にしつつ、ch4向けに以下を変更している。
 - ユーザー要望（2026-09-09）でスコープを最小化: Discordの声の集約先は「アイデア出し」
@@ -13,7 +13,7 @@
   明示することをSYSTEM_PROMPTで強く指示している（実績が少ないのに断定的な
   Try提案を出すと誤った方向にチューニングしてしまうリスクがあるため）。
 
-## 絶対厳守のガードレール（project_analytics_kpt / project_risk_countermeasures 参照）
+## 絶対厳守のガードレール
 1. 永久的な収益の最大化（短期的な変化より右肩上がりの継続を優先）
 2. 炎上・アカウント停止・個人情報漏洩リスクをゼロにする
 Try提案はこの2点に抵触しないかをGemini自身に自己判定させ、抵触の疑いがあるものは
@@ -63,8 +63,8 @@ RETENTION_CHECKPOINTS = [0.25, 0.5, 0.75, 0.9]  # 8-7: 離脱曲線データを�
 MODEL_NAME = "gemini-flash-lite-latest"
 
 LOOKBACK_DAYS = 7
-FEEDBACK_CHANNEL = "SimuSphere_アイデア出し"
-KPT_CHANNEL = "SimuSphere_kpt報告"
+FEEDBACK_CHANNEL = "battle_ideas"
+KPT_CHANNEL = "battle_kpt_reports"
 MAX_FEEDBACK_MESSAGES = 30
 
 TRY_ITEM_SCHEMA = {
@@ -116,7 +116,7 @@ REVISION_SCHEMA = {
 }
 
 SYSTEM_PROMPT = """\
-あなたは幾何学図形の物理演算バトル動画チャンネル（SimuSphere Arena）のデータアナリスト兼\
+あなたは幾何学図形の物理演算バトル動画チャンネル（物理演算バトルチャンネル）のデータアナリスト兼\
 ディレクターです。直近1週間の状況をもとに、週次KPT（Keep/Problem/Try）を作成してください。
 
 ## このチャンネルの前提（重要）
@@ -508,7 +508,7 @@ def format_kpt_message(week_label: str, keep: list[str], problem: list[str], saf
     try_text = "\n".join(format_try_item(t) for t in safe_tries) or "(今週は提案なし)"
 
     message = (
-        f"📊 SimuSphere Arena 週次KPT報告（{week_label}）\n\n"
+        f"📊 物理演算バトルチャンネル 週次KPT報告（{week_label}）\n\n"
         f"■Keep\n{keep_text}\n\n■Problem\n{problem_text}\n\n■Try\n{try_text}\n"
     )
     if rejected_count:
@@ -576,7 +576,7 @@ def main():
     pending = state.get("pending")
     if pending and not pending.get("resolved"):
         print(
-            "[SimuSphere KPT] 前回分がまだ意見交換中/未確定のため、今週の新規生成はスキップします。"
+            "[battle KPT] 前回分がまだ意見交換中/未確定のため、今週の新規生成はスキップします。"
             "geometry_battle_kpt_followup.py が確定を検知するまでお待ちください。"
         )
         return
@@ -586,7 +586,7 @@ def main():
     post_and_record_kpt(summary, kpt, state)
 
     _save_state(state)
-    print("SimuSphere Arenaの週次KPTを生成し、Discordへ投稿しました。")
+    print("物理演算バトルチャンネルの週次KPTを生成し、Discordへ投稿しました。")
 
 
 if __name__ == "__main__":

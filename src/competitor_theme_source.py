@@ -1,5 +1,5 @@
 """競合チャンネルの人気動画を、着想元としてテーマプールに反映する
-（[[project-theme-engine]]の当初設計「4ソース」のうち、競合人気動画分析を担当）。
+（当初設計の「4ソース」のうち、競合人気動画分析を担当）。
 
 competitor_style_analysis.py が既に取得済みの競合動画タイトル
 （scripts_templates/competitor_video_titles.json）を読むだけで、新規のYouTube API
