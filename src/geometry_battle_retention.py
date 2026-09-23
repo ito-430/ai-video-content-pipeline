@@ -11,13 +11,13 @@
 (ch1の`collect_analytics.py`)が既に集めている指標セットに、Shorts固有のフィード露出
 指標(impressions/impressionClickThroughRate)を加えた形。取得した指標をどう解釈し、
 どんな対策(ルール重み調整等)を打つかはここでは判断せず、週次KPT
-(geometry_battle_kpt.py、ルール別に集計して提示)・Claude Codeセッションでの
+(geometry_battle_kpt.py、ルール別に集計して提示)による
 人間判断に委ねる設計を維持する。
 
 投稿から一定日数(RETENTION_MIN_AGE_DAYS)経過し、まだ取得していない公開動画についてのみ
 取得する(非公開/限定公開は十分な視聴データが集まらないため対象外。投稿直後もデータが
 安定しないため待つ)。実際の閾値調整はここでは行わず、取得・蓄積までを担当する
-(継続的な調整は週次KPT・Claude Codeセッションでの判断に委ねる設計)。
+(継続的な調整は週次KPTでの人間判断に委ねる設計)。
 """
 
 import json

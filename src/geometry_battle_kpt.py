@@ -273,7 +273,7 @@ def _character_summary() -> str:
 
 def _retention_summary() -> str:
     """8-7「離脱曲線データの取得」: geometry_battle_retention.pyが週次で蓄積したデータを要約する。
-    実際の閾値調整はKPTでの議論・Claude Codeセッションでの対応に委ねる（ここでは提示するだけ）。
+    実際の閾値調整はKPTでの議論を踏まえて開発側で判断する（ここでは提示するだけ）。
     """
     if not os.path.exists(RETENTION_PATH):
         return "(離脱曲線データはまだありません。投稿から数日経過した動画から順次取得されます)"
@@ -328,7 +328,7 @@ def _algo_metrics_by_axis(axis: str, log: list[dict], retention: dict) -> str:
     """geometry_battle_retention.pyが集めるサマリー指標(views/平均視聴率/いいね/コメント/
     シェア/登録者増加/インプレッションCTR)を、video_logの指定軸(rule/shape/player_shape/
     terrain)の値と突き合わせて集計する。対策の判断・実施はここでは行わず、このチャンネルの
-    既存方針通りKPTでの人間判断(Claude Codeセッション)に委ねる。
+    既存方針通りKPTでの人間判断に委ねる。
     match_type軸は2026-09-21追加のため、それ以前に記録された動画にはフィールド自体が
     無い。その場合は当時の唯一の対戦形式だった"individual"として扱う(他の軸は
     未記録=文字通り「無し」で構わないため、match_typeだけ既定値を変える)。"""

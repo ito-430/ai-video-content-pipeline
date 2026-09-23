@@ -1,4 +1,4 @@
-"""緊急停止・限定公開化フロー（fromdeveloper/claude_code_risk_taisaku_shiji.md 項目3）。
+"""緊急停止・限定公開化フロー。
 
 想定トリガー:
 1. 運営者がDiscordの「システムからの要求」チャンネルに `!emergency_stop <動画IDまたはURL>` と

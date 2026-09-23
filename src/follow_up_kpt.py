@@ -8,7 +8,7 @@
   刺激的・炎上リスクが少しでもある提案には、変更前後の具体的な台本例を必ず添える。
 
 「承認」が確定した後の、実際の生成パラメータへの反映自体はここでは行わない
-（コード変更を伴う判断のため、Claude Codeセッションでの別途対応が必要）。
+（コード変更を伴う判断のため、開発者による別途対応が必要）。
 """
 
 import json
@@ -49,7 +49,7 @@ risk_levelを"mild"にした上で、変更前(before_example)と変更後(after
 
 def _finalize(state: dict, pending: dict, approve_count: int, reject_count: int) -> None:
     if approve_count > reject_count:
-        judgment, status = "承認", "承認（実際のパラメータ反映はClaude Codeセッションで別途対応）"
+        judgment, status = "承認", "承認（実際のパラメータ反映は開発側で別途対応）"
         note = "✅ この案で承認として記録しました。実際の反映は次回の開発セッションで対応します。"
     elif reject_count > approve_count:
         judgment, status = "却下", "見送り"
